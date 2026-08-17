@@ -2,8 +2,19 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { VenueShell, MarketDetail, ActivityFeed, ResolutionReceipt, ErrorState, Skeleton, fmtWei, short, useMarketDetailData } from '@prophecy-dev/venue-kit'
+import { VenueShell, MarketDetail, ActivityFeed, ResolutionReceipt, EmptyState, ErrorState, Skeleton, fmtWei, short, useMarketDetailData } from '@prophecy-dev/venue-kit'
 import { Comments, useConnect } from '@prophecy-dev/connect-react'
+import { TailgateHeader } from '../../components/tailgate-header'
+
+function TailgateEmpty({ title, message }: { title: string; message: string }) {
+  return (
+    <EmptyState
+      className="tailgate-empty"
+      title={title}
+      message={message}
+    />
+  )
+}
 
 /**
  * The detail page is where the FULL question belongs. The card showed the short title because a
@@ -23,7 +34,7 @@ export function MarketView({ id }: { id: string }) {
   return (
     <div data-density="sparse" data-archetype="tailgate">
       <VenueShell
-        brand="The Tailgate"
+        header={<TailgateHeader />}
         footer={
           <div className="tailgate-footer">
             <span>The Tailgate</span>
@@ -40,7 +51,7 @@ export function MarketView({ id }: { id: string }) {
             <Skeleton height={220} radius={12} />
           </div>
         ) : notFound || !asked ? (
-          <ErrorState title="Market not found" message="This market may have been removed, or the link is wrong." />
+          <ErrorState title="That sign came down" message="Head back to the lot and pick another call." />
         ) : (
           <>
             <div className="tailgate-detail-kicker">Make your call</div>
@@ -51,16 +62,27 @@ export function MarketView({ id }: { id: string }) {
               decimals={asked.collateral?.decimals ?? 18}
             />
             <h2 className="venue-section">What the crowd is saying</h2>
-            <Comments subjectType="event" subjectRef={id} />
+            <Comments
+              subjectType="event"
+              subjectRef={id}
+              emptyState={<TailgateEmpty title="The folding chairs are quiet" message="Bring the first take to the circle." />}
+            />
             {/* WHY a market resolved the way it did, with its sources. Works with no configuration at
                 all, and it is the honest answer to "why did I lose?" — which is the question that
                 decides whether someone comes back. */}
             <h2 className="venue-section">The final word</h2>
-            <ResolutionReceipt marketId={id} />
+            <ResolutionReceipt
+              marketId={id}
+              emptyState={<TailgateEmpty title="The whistle has not blown" message="The final receipt lands after this call settles." />}
+            />
             {/* The trades on THIS market. Scoped by marketId, so unlike the venue-wide feed on the
                 home page it needs no venue id and is true from the first run. */}
             <h2 className="venue-section">Recent calls</h2>
-            <ActivityFeed marketId={id} limit={10} />
+            <ActivityFeed
+              marketId={id}
+              limit={10}
+              emptyState={<TailgateEmpty title="The cooler lid is clean" message="The next call leaves the first mark." />}
+            />
             <ResolutionNotes market={asked} />
           </>
         )}

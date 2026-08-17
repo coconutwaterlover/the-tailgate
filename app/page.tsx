@@ -3,10 +3,21 @@
 import { useEffect, useState } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
 import { useDailyDrip, useProphecy, useStarterGrant } from '@prophecy-dev/connect-react'
-import { VenueShell, MarketGrid, marketPath, MiniLeaderboard, PositionsTable, FeaturedMarket, pickFeatured } from '@prophecy-dev/venue-kit'
+import {
+  VenueShell,
+  MarketGrid,
+  marketPath,
+  MiniLeaderboard,
+  PositionsTable,
+  FeaturedMarket,
+  EmptyState,
+  pickFeatured,
+  type PositionRow,
+} from '@prophecy-dev/venue-kit'
 // THIS VENUE'S OWN MARKETS. Not useMarketBrowse/useEvents — those read every market on the
 // platform, and this venue is a VIEW over the pool, not the pool.
 import { useVenueMarkets } from './venue-markets'
+import { TailgateHeader } from './components/tailgate-header'
 
 
 // Composed over @prophecy-dev/venue-kit.
@@ -63,6 +74,16 @@ Every pick should feel like slapping 25 PST on a cooler lid, not filling in a fo
 ] as const
 
 const FULL_VENUE_PROMPT = VENUE_PROMPTS.map(({ title, prompt }) => `${title}\n\n${prompt}`).join('\n\n---\n\n')
+
+function TailgateEmpty({ title, message }: { title: string; message: string }) {
+  return (
+    <EmptyState
+      className="tailgate-empty"
+      title={title}
+      message={message}
+    />
+  )
+}
 
 function CopyVenueSection() {
   const [copied, setCopied] = useState<string | null>(null)
@@ -135,7 +156,56 @@ function MyPositionsInner() {
   // venue-kit 1.8.0 it was the only dead end in the venue: the market cards next to it were links and
   // these were plain text. `marketPath` builds the same /m/{id}-{slug} the cards use, so a position
   // and a card lead to the same URL and the market page reads the id back out with `parseMarketId`.
-  return <PositionsTable wallet={session?.wallet ?? null} marketHref={(p) => marketPath(p.marketId, p.marketTitle ?? p.marketName, '/m')} />
+  return (
+    <PositionsTable
+      wallet={session?.wallet ?? null}
+      marketHref={(p) => marketPath(p.marketId, p.marketTitle ?? p.marketName, '/m')}
+      renderCard={(row) => <PositionTicket row={row} />}
+      emptyState={
+        <TailgateEmpty
+          title="Your ticket roll is clear"
+          message="Make a call and your stub will land here."
+        />
+      }
+    />
+  )
+}
+
+function PositionTicket({ row }: { row: PositionRow }) {
+  const position = row.position
+  const href = marketPath(position.marketId, position.marketTitle ?? position.marketName, '/m')
+  const ticketNumber = position.marketId.replace(/^0x/, '').slice(-6).toUpperCase()
+
+  return (
+    <div className="tailgate-position-ticket">
+      <a className="tailgate-position-ticket__title" href={href}>
+        {row.marketLabel}
+      </a>
+      <div className="tailgate-position-ticket__call">
+        <span>{row.side}</span>
+        <strong>{row.pnlLabel ?? 'Call pending'}</strong>
+      </div>
+      <dl className="tailgate-position-ticket__stats">
+        <div>
+          <dt>On the stub</dt>
+          <dd>{row.sizeLabel ?? '—'}</dd>
+        </div>
+        <div>
+          <dt>Paid in</dt>
+          <dd>{row.costLabel ?? '—'}</dd>
+        </div>
+        <div>
+          <dt>Worth now</dt>
+          <dd>{row.valueLabel ?? '—'}</dd>
+        </div>
+      </dl>
+      {row.statusLabel ? <span className="tailgate-position-ticket__status">{row.statusLabel}</span> : null}
+      <footer>
+        <span>Seat · {row.side}</span>
+        <span>Ticket · TG-{ticketNumber}</span>
+      </footer>
+    </div>
+  )
 }
 
 /**
@@ -220,8 +290,7 @@ export default function Page() {
   return (
     <div data-density="sparse" data-archetype="tailgate">
     <VenueShell
-      brand="The Tailgate"
-      walletSlot={<WalletButton />}
+      header={<TailgateHeader walletSlot={<WalletButton />} />}
       footer={
         <div className="tailgate-footer">
           <span>The Tailgate</span>
@@ -232,7 +301,6 @@ export default function Page() {
       <>
           <section className="tailgate-hero">
             <div className="tailgate-hero__copy">
-              <span className="tailgate-kicker">Lot open · Two hours to kickoff</span>
               <h1>Grab a chair.<br />Make the call.</h1>
               <p>The grills are going and the signs are up. Pick your side, put it on the cooler, and let the whole lot know where you stand.</p>
             </div>
@@ -274,8 +342,12 @@ export default function Page() {
               events={rest.slice(0, 7)}
               loading={loading}
               variant="list"
-              emptyTitle="Nothing to call right now"
-              emptyMessage="The board is quiet. Check back when the next matchup lands."
+              emptyState={
+                <TailgateEmpty
+                  title="The plywood is blank"
+                  message="Check back when the next call gets chalked up."
+                />
+              }
               cardHref={(event) => marketPath(event.id, event.title ?? event.name, '/m')}
             />
           </section>
@@ -286,7 +358,16 @@ export default function Page() {
               <h2>Loudest in the lot</h2>
               <p>Being right earns the folding-chair bragging rights.</p>
             </div>
-            <MiniLeaderboard metric="edge" limit={5} />
+            <MiniLeaderboard
+              metric="edge"
+              limit={5}
+              emptyState={
+                <TailgateEmpty
+                  title="The cooler is quiet"
+                  message="Be first to claim the loud chair."
+                />
+              }
+            />
           </section>
 
           <section className="tailgate-section tailgate-positions">

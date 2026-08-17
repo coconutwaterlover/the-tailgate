@@ -63,6 +63,79 @@ body {
   background-color: #d4d0c2;
 }
 
+[data-archetype='tailgate'] .vk-shell {
+  background:
+    repeating-linear-gradient(103deg, transparent 0 218px, color-mix(in srgb, var(--pc-onaccent) 42%, transparent) 220px 226px, transparent 228px 450px),
+    radial-gradient(circle at 14% 22%, color-mix(in srgb, var(--pc-border) 7%, transparent) 0 1px, transparent 2px),
+    radial-gradient(circle at 78% 64%, color-mix(in srgb, var(--pc-border) 8%, transparent) 0 1px, transparent 2px),
+    color-mix(in srgb, var(--pc-surface) 74%, var(--pc-border));
+  background-size: auto, 21px 21px, 27px 27px, auto;
+}
+
+[data-archetype='tailgate'] .vk-shell__bar {
+  min-height: 68px;
+}
+
+.tailgate-header__identity {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--pc-space) * 3);
+  min-width: 0;
+}
+
+.tailgate-header__tower {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 48px;
+  overflow: visible;
+  fill: none;
+  stroke: var(--pc-muted);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.35;
+  opacity: 0.72;
+}
+
+.tailgate-header__tower--right {
+  transform: scaleX(-1);
+}
+
+.tailgate-header__bulbs {
+  fill: var(--pc-accent);
+  stroke: none;
+  opacity: 0.82;
+}
+
+.tailgate-header__copy {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  text-align: center;
+}
+
+.tailgate-header__copy strong {
+  color: var(--pc-text);
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-size: 1.1rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.tailgate-header__copy span {
+  color: var(--pc-muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tailgate-header__wallet {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
 [data-archetype='tailgate'] .vk-shell__main {
   display: grid;
   gap: calc(var(--pc-space) * 14);
@@ -102,7 +175,6 @@ body {
   z-index: 1;
 }
 
-.tailgate-kicker,
 .tailgate-ticket__label {
   display: inline-flex;
   align-items: center;
@@ -114,18 +186,9 @@ body {
   color: var(--pc-text);
 }
 
-.tailgate-kicker::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--pc-gain);
-  box-shadow: 0 0 0 5px rgba(45, 122, 81, 0.14);
-}
-
 .tailgate-hero h1 {
   max-width: 780px;
-  margin: 18px 0 16px;
+  margin: 0 0 16px;
   font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
   font-size: clamp(3rem, 7.3vw, 7rem);
   line-height: 0.88;
@@ -200,11 +263,10 @@ body {
 
 .tailgate-section__head {
   display: grid;
-  grid-template-columns: 42px minmax(180px, 0.7fr) minmax(220px, 1fr);
+  grid-template-columns: 42px minmax(280px, 1fr) minmax(220px, 0.7fr);
   gap: calc(var(--pc-space) * 5);
   align-items: baseline;
   padding-bottom: calc(var(--pc-space) * 4);
-  border-bottom: 1px solid var(--pc-border);
 }
 
 .tailgate-section__head > span {
@@ -215,6 +277,9 @@ body {
 }
 
 .tailgate-section__head h2 {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--pc-space) * 3);
   margin: 0;
   font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
   font-size: clamp(1.55rem, 3vw, 2.6rem);
@@ -222,6 +287,26 @@ body {
   letter-spacing: -0.035em;
   text-transform: uppercase;
   color: var(--pc-text);
+}
+
+.tailgate-section__head h2::before,
+.tailgate-section__head h2::after {
+  content: '';
+  height: 2px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--pc-border) 62%, transparent) 0 12px,
+      transparent 12px 21px
+    );
+}
+
+.tailgate-section__head h2::before {
+  flex: 0 0 30px;
+}
+
+.tailgate-section__head h2::after {
+  flex: 1 1 52px;
 }
 
 .tailgate-section__head p {
@@ -406,7 +491,9 @@ body {
 
 [data-archetype='tailgate'] .vk-card {
   border-width: 2px;
+  border-top: 5px solid var(--pc-accent);
   background:
+    repeating-linear-gradient(3deg, transparent 0 18px, color-mix(in srgb, var(--pc-border) 9%, transparent) 19px 20px),
     linear-gradient(95deg, rgba(255, 255, 255, 0.13), transparent 35% 70%, rgba(80, 54, 25, 0.07)),
     var(--pc-inner);
   box-shadow: 4px 5px 0 rgba(73, 67, 49, 0.16);
@@ -433,6 +520,304 @@ body {
 [data-archetype='tailgate'] .vk-card button:active {
   transform: translateY(4px);
   box-shadow: 0 0 0 var(--pc-border);
+}
+
+/* The probability stays the kit's number and width. This is only its tailgate skin: a warm heat
+   wash and a small flame riding the live edge, deliberately isolated from --pc-danger. */
+[data-archetype='tailgate'] .vk-card__outcome-bar {
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--pc-inner) 66%, var(--pc-onaccent)),
+      color-mix(in srgb, var(--pc-accent) 72%, var(--pc-inner))
+    );
+  border-right: 2px solid color-mix(in srgb, var(--pc-accent) 78%, var(--pc-border));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--pc-onaccent) 50%, transparent);
+}
+
+[data-archetype='tailgate'] .vk-card__outcome-bar::after {
+  content: '🔥';
+  position: absolute;
+  right: 3px;
+  top: 50%;
+  width: auto;
+  height: auto;
+  font-size: 13px;
+  line-height: 1;
+  filter: saturate(0.82);
+  transform: translateY(-52%);
+}
+
+/* Admission stubs: renderCard changes presentation only; PositionsTable still owns fetching,
+   position maths, in-flight state and the wired sell control beside this node. */
+.tailgate-positions .vk-pos-cards {
+  counter-reset: tailgate-ticket;
+  gap: calc(var(--pc-space) * 4);
+}
+
+.tailgate-positions .vk-pos-card {
+  position: relative;
+  overflow: hidden;
+  counter-increment: tailgate-ticket;
+  padding: 0;
+  border: 2px solid var(--pc-border);
+  border-radius: 1px;
+  background:
+    repeating-linear-gradient(2deg, transparent 0 22px, color-mix(in srgb, var(--pc-border) 8%, transparent) 23px 24px),
+    var(--pc-inner);
+  box-shadow: 5px 6px 0 color-mix(in srgb, var(--pc-border) 18%, transparent);
+}
+
+.tailgate-positions .vk-pos-card::before,
+.tailgate-positions .vk-pos-card::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  bottom: 35px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--pc-border);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--pc-surface) 74%, var(--pc-border));
+}
+
+.tailgate-positions .vk-pos-card::before {
+  left: -10px;
+}
+
+.tailgate-positions .vk-pos-card::after {
+  right: -10px;
+}
+
+.tailgate-position-ticket {
+  display: grid;
+  gap: calc(var(--pc-space) * 4);
+  min-width: 0;
+  padding: calc(var(--pc-space) * 6);
+}
+
+.tailgate-position-ticket__title {
+  color: var(--pc-text);
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-size: clamp(1.25rem, 2.5vw, 1.8rem);
+  font-weight: 800;
+  line-height: 1.05;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.tailgate-position-ticket__title:hover {
+  color: var(--pc-accent);
+}
+
+.tailgate-position-ticket__call {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--pc-space) * 4);
+}
+
+.tailgate-position-ticket__call span,
+.tailgate-position-ticket footer {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tailgate-position-ticket__call span {
+  width: fit-content;
+  border: 1px solid var(--pc-border);
+  padding: 4px 8px;
+  background: var(--pc-surface);
+  color: var(--pc-text);
+}
+
+.tailgate-position-ticket__call strong {
+  color: var(--pc-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.tailgate-position-ticket__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: calc(var(--pc-space) * 4);
+  margin: 0;
+}
+
+.tailgate-position-ticket__stats div {
+  min-width: 0;
+}
+
+.tailgate-position-ticket__stats dt {
+  color: var(--pc-muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tailgate-position-ticket__stats dd {
+  overflow-wrap: anywhere;
+  margin: 3px 0 0;
+  color: var(--pc-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.tailgate-position-ticket__status {
+  color: var(--pc-muted);
+  font-size: 11px;
+}
+
+.tailgate-position-ticket footer {
+  display: flex;
+  justify-content: space-between;
+  gap: calc(var(--pc-space) * 4);
+  margin: calc(var(--pc-space) * 2) calc(var(--pc-space) * -6) calc(var(--pc-space) * -6);
+  border-top: 2px dashed var(--pc-border);
+  padding: calc(var(--pc-space) * 4) calc(var(--pc-space) * 6);
+  background: color-mix(in srgb, var(--pc-surface) 52%, var(--pc-inner));
+  color: var(--pc-muted);
+}
+
+.tailgate-positions .vk-pos-card > .vk-sell {
+  margin: 0 calc(var(--pc-space) * 6) calc(var(--pc-space) * 5);
+  border-radius: 2px;
+  border-width: 2px;
+  box-shadow: 0 3px 0 var(--pc-border);
+}
+
+/* The cooler is a real object now: each rank is a red can, stacked on a cold inner surface. */
+.tailgate-competition .vk-activity {
+  gap: calc(var(--pc-space) * 2);
+  border: 7px solid var(--pc-inner);
+  padding: calc(var(--pc-space) * 4);
+  background:
+    linear-gradient(115deg, color-mix(in srgb, var(--pc-surface) 74%, var(--pc-onaccent)), var(--pc-surface));
+  box-shadow:
+    inset 0 0 0 2px var(--pc-border),
+    inset 0 10px 18px color-mix(in srgb, var(--pc-border) 12%, transparent);
+}
+
+.tailgate-competition .vk-activity__row {
+  min-height: 48px;
+  border: 0;
+  padding: 5px 8px;
+}
+
+.tailgate-competition .vk-activity__row:nth-child(even) {
+  transform: translateX(12px);
+}
+
+.tailgate-competition .vk-table__rank {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 38px;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 2px solid var(--pc-border);
+  border-radius: 7px 7px 10px 10px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--pc-accent) 62%, var(--pc-onaccent)), var(--pc-accent) 46% 78%, color-mix(in srgb, var(--pc-accent) 72%, var(--pc-border)));
+  box-shadow:
+    inset 0 4px 0 color-mix(in srgb, var(--pc-onaccent) 48%, transparent),
+    0 3px 0 var(--pc-border);
+  color: var(--pc-onaccent);
+  font-weight: 900;
+}
+
+.tailgate-competition .vk-table__rank::before {
+  content: '';
+  position: absolute;
+  inset: 3px 5px auto;
+  height: 4px;
+  border: 1px solid color-mix(in srgb, var(--pc-border) 65%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--pc-onaccent) 68%, var(--pc-border));
+}
+
+.tailgate-competition .vk-activity__who {
+  color: var(--pc-text);
+  font-weight: 800;
+}
+
+.tailgate-competition .vk-activity__amt {
+  color: var(--pc-text);
+  font-weight: 900;
+}
+
+/* Empty states stay text-led; only loading gets the chalk route below. */
+.tailgate-empty {
+  border: 2px dashed var(--pc-border);
+  background: color-mix(in srgb, var(--pc-surface) 72%, transparent);
+}
+
+[data-archetype='tailgate'] .vk-card[aria-hidden='true']::after,
+.tailgate-detail-loading::after,
+.tailgate-holders__loading::after,
+.tailgate-positions .vk-table-wrap:has(.vk-skel)::after,
+.tailgate-competition .vk-activity:has(.vk-skel)::after {
+  content: '';
+  display: block;
+  width: 82px;
+  height: 48px;
+  background: color-mix(in srgb, var(--pc-onaccent) 68%, var(--pc-inner));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 82 48'%3E%3Ccircle cx='13' cy='34' r='6' fill='none' stroke='black' stroke-width='2.4'/%3E%3Ccircle cx='38' cy='13' r='6' fill='none' stroke='black' stroke-width='2.4'/%3E%3Cpath d='M20 32 Q34 17 53 19 T72 10 M65 7 72 10 67 16' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round' stroke-dasharray='5 4'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 82 48'%3E%3Ccircle cx='13' cy='34' r='6' fill='none' stroke='black' stroke-width='2.4'/%3E%3Ccircle cx='38' cy='13' r='6' fill='none' stroke='black' stroke-width='2.4'/%3E%3Cpath d='M20 32 Q34 17 53 19 T72 10 M65 7 72 10 67 16' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round' stroke-dasharray='5 4'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+[data-archetype='tailgate'] .vk-card[aria-hidden='true'],
+.tailgate-detail-loading,
+.tailgate-holders__loading,
+.tailgate-positions .vk-table-wrap:has(.vk-skel),
+.tailgate-competition .vk-activity:has(.vk-skel) {
+  position: relative;
+  min-height: 96px;
+}
+
+[data-archetype='tailgate'] .vk-card[aria-hidden='true'] .vk-skel,
+.tailgate-detail-loading .vk-skel,
+.tailgate-holders__loading .vk-skel,
+.tailgate-positions .vk-table-wrap:has(.vk-skel) .vk-skel,
+.tailgate-competition .vk-activity:has(.vk-skel) .vk-skel {
+  visibility: hidden;
+}
+
+[data-archetype='tailgate'] .vk-card[aria-hidden='true']::after,
+.tailgate-detail-loading::after,
+.tailgate-holders__loading::after,
+.tailgate-positions .vk-table-wrap:has(.vk-skel)::after,
+.tailgate-competition .vk-activity:has(.vk-skel)::after {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  animation: tailgate-route-pulse 1.35s ease-in-out infinite;
+}
+
+@keyframes tailgate-route-pulse {
+  0%,
+  100% {
+    opacity: 0.48;
+    transform: translate(-52%, -50%);
+  }
+  50% {
+    opacity: 0.95;
+    transform: translate(-48%, -50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-archetype='tailgate'] .vk-card[aria-hidden='true']::after,
+  .tailgate-detail-loading::after,
+  .tailgate-holders__loading::after,
+  .tailgate-positions .vk-table-wrap:has(.vk-skel)::after,
+  .tailgate-competition .vk-activity:has(.vk-skel)::after {
+    animation: none;
+    opacity: 0.8;
+    transform: translate(-50%, -50%);
+  }
 }
 
 .tailgate-copy {
@@ -622,6 +1007,31 @@ body {
 }
 
 @media (max-width: 760px) {
+  [data-archetype='tailgate'] .vk-shell__bar {
+    gap: 6px;
+    min-height: 60px;
+    padding-inline: 10px;
+  }
+
+  .tailgate-header__identity {
+    gap: 4px;
+  }
+
+  .tailgate-header__tower {
+    flex-basis: 27px;
+    width: 27px;
+    height: 40px;
+  }
+
+  .tailgate-header__copy strong {
+    font-size: 0.92rem;
+  }
+
+  .tailgate-header__copy span {
+    font-size: 7px;
+    letter-spacing: 0.06em;
+  }
+
   [data-archetype='tailgate'] .vk-shell__main {
     gap: calc(var(--pc-space) * 10);
   }
@@ -655,6 +1065,14 @@ body {
 
   .tailgate-section__head {
     grid-template-columns: 34px 1fr;
+  }
+
+  .tailgate-section__head h2 {
+    gap: calc(var(--pc-space) * 2);
+  }
+
+  .tailgate-section__head h2::before {
+    flex-basis: 14px;
   }
 
   .tailgate-section__head p {
