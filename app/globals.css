@@ -1,6 +1,6 @@
 html {
-  background: #0d1b14;
-  color-scheme: dark;
+  background: #d4d0c2;
+  color-scheme: light;
 }
 html,
 body {
@@ -9,7 +9,7 @@ body {
 }
 
 body {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: Avenir, "Avenir Next", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 /* The plan's density (doc 20). --pc-space is the kit's spacing BASE (0.25rem); every spacing rule
@@ -58,9 +58,9 @@ body {
 [data-archetype='tailgate'] {
   min-height: 100vh;
   background:
-    linear-gradient(rgba(244, 196, 48, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(244, 196, 48, 0.035) 1px, transparent 1px);
-  background-size: 44px 44px;
+    repeating-linear-gradient(104deg, transparent 0 210px, rgba(255, 255, 255, 0.38) 212px 218px, transparent 220px 430px),
+    linear-gradient(rgba(70, 66, 54, 0.06), rgba(70, 66, 54, 0.06));
+  background-color: #d4d0c2;
 }
 
 [data-archetype='tailgate'] .vk-shell__main {
@@ -76,22 +76,24 @@ body {
   align-items: end;
   min-height: 410px;
   overflow: hidden;
-  border: 1px solid var(--pc-border);
+  border: 2px solid var(--pc-border);
   border-radius: var(--pc-radius);
   padding: clamp(28px, 6vw, 76px);
   background:
-    radial-gradient(circle at 82% 16%, rgba(244, 196, 48, 0.18), transparent 25%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.055), transparent 52%),
-    repeating-linear-gradient(90deg, transparent 0 12.2%, rgba(255, 255, 255, 0.035) 12.2% 12.5%);
+    radial-gradient(circle at 84% 12%, rgba(255, 235, 146, 0.95), transparent 18%),
+    linear-gradient(to bottom, #acd4df 0 47%, #c9c4b5 47% 100%);
+  box-shadow: 7px 8px 0 rgba(73, 67, 49, 0.16);
 }
 
 .tailgate-hero::before {
   content: '';
   position: absolute;
-  inset: 10% 50% 10% auto;
-  width: 1px;
-  background: var(--pc-border);
-  opacity: 0.5;
+  left: -5%;
+  right: -5%;
+  bottom: 22%;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.72);
+  transform: rotate(-3deg);
 }
 
 .tailgate-hero__copy,
@@ -109,7 +111,7 @@ body {
   font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--pc-accent);
+  color: var(--pc-text);
 }
 
 .tailgate-kicker::before {
@@ -118,15 +120,16 @@ body {
   height: 8px;
   border-radius: 50%;
   background: var(--pc-gain);
-  box-shadow: 0 0 0 5px rgba(101, 196, 102, 0.12);
+  box-shadow: 0 0 0 5px rgba(45, 122, 81, 0.14);
 }
 
 .tailgate-hero h1 {
   max-width: 780px;
   margin: 18px 0 16px;
-  font-size: clamp(3rem, 8vw, 7.5rem);
-  line-height: 0.82;
-  letter-spacing: -0.075em;
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-size: clamp(3rem, 7.3vw, 7rem);
+  line-height: 0.88;
+  letter-spacing: -0.045em;
   text-transform: uppercase;
   color: var(--pc-text);
 }
@@ -136,22 +139,27 @@ body {
   margin: 0;
   font-size: clamp(1rem, 1.7vw, 1.25rem);
   line-height: 1.55;
-  color: var(--pc-muted);
+  color: var(--pc-text);
+  font-weight: 600;
 }
 
 .tailgate-ticket {
   display: grid;
   gap: calc(var(--pc-space) * 4);
   padding: calc(var(--pc-space) * 7);
-  border: 1px dashed var(--pc-border);
-  background: var(--pc-inner);
-  transform: rotate(1.5deg);
+  border: 3px solid var(--pc-border);
+  background:
+    linear-gradient(92deg, rgba(255, 255, 255, 0.13), transparent 28% 72%, rgba(80, 54, 25, 0.08)),
+    var(--pc-inner);
+  box-shadow: 6px 7px 0 rgba(73, 67, 49, 0.24);
+  transform: rotate(-1.5deg);
 }
 
 .tailgate-ticket strong {
   padding-bottom: calc(var(--pc-space) * 4);
   border-bottom: 2px solid var(--pc-accent);
-  font-size: 1.6rem;
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-size: 1.8rem;
   text-transform: uppercase;
   color: var(--pc-text);
 }
@@ -170,7 +178,7 @@ body {
   overflow: hidden;
   margin-top: calc(var(--pc-space) * -7);
   padding: calc(var(--pc-space) * 4) calc(var(--pc-space) * 6);
-  border-block: 1px solid var(--pc-border);
+  border-block: 2px solid var(--pc-border);
   background: var(--pc-accent);
   color: var(--pc-onaccent);
   font-size: 11px;
@@ -180,7 +188,7 @@ body {
 }
 
 .tailgate-marquee span::before {
-  content: '◆';
+  content: '★';
   margin-right: 10px;
 }
 
@@ -208,7 +216,8 @@ body {
 
 .tailgate-section__head h2 {
   margin: 0;
-  font-size: clamp(1.45rem, 3vw, 2.4rem);
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-size: clamp(1.55rem, 3vw, 2.6rem);
   line-height: 1;
   letter-spacing: -0.035em;
   text-transform: uppercase;
@@ -223,10 +232,14 @@ body {
 
 .tailgate-competition {
   padding: clamp(22px, 4vw, 48px);
-  border: 1px solid var(--pc-border);
+  border: 2px solid var(--pc-border);
   background:
-    linear-gradient(125deg, rgba(244, 196, 48, 0.1), transparent 42%),
-    var(--pc-inner);
+    linear-gradient(45deg, rgba(201, 77, 52, 0.09) 25%, transparent 25% 75%, rgba(201, 77, 52, 0.09) 75%),
+    linear-gradient(45deg, rgba(201, 77, 52, 0.09) 25%, transparent 25% 75%, rgba(201, 77, 52, 0.09) 75%),
+    var(--pc-surface);
+  background-position: 0 0, 18px 18px;
+  background-size: 36px 36px;
+  box-shadow: 6px 7px 0 rgba(73, 67, 49, 0.15);
 }
 
 .venue-pst {
@@ -301,13 +314,306 @@ body {
   text-transform: uppercase;
 }
 
+.tailgate-holders {
+  display: grid;
+  gap: calc(var(--pc-space) * 4);
+  margin-block: calc(var(--pc-space) * 8);
+  padding: calc(var(--pc-space) * 6);
+  border: 2px solid var(--pc-border);
+  background:
+    linear-gradient(96deg, rgba(255, 255, 255, 0.13), transparent 45% 75%, rgba(80, 54, 25, 0.07)),
+    var(--pc-inner);
+  box-shadow: 4px 5px 0 rgba(73, 67, 49, 0.16);
+}
+
+.tailgate-holders__head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: calc(var(--pc-space) * 5);
+  padding-bottom: calc(var(--pc-space) * 4);
+  border-bottom: 1px dashed var(--pc-border);
+}
+
+.tailgate-holders__head span {
+  color: var(--pc-accent);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tailgate-holders__head h2 {
+  margin: 5px 0 0;
+  color: var(--pc-text);
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.tailgate-holders__head p,
+.tailgate-holders__empty {
+  margin: 0;
+  color: var(--pc-muted);
+  font-size: 13px;
+}
+
+.tailgate-holders__loading {
+  display: grid;
+  gap: calc(var(--pc-space) * 2);
+}
+
+.tailgate-holders__list {
+  list-style: none;
+  display: grid;
+  margin: 0;
+  padding: 0;
+}
+
+.tailgate-holders__list li {
+  display: grid;
+  grid-template-columns: 34px minmax(110px, 1fr) minmax(80px, 0.7fr) auto;
+  gap: calc(var(--pc-space) * 4);
+  align-items: center;
+  min-height: 42px;
+  border-bottom: 1px solid rgba(97, 89, 66, 0.3);
+  color: var(--pc-text);
+  font-size: 13px;
+}
+
+.tailgate-holders__list li:last-child {
+  border-bottom: 0;
+}
+
+.tailgate-holders__rank {
+  color: var(--pc-accent);
+  font-weight: 900;
+}
+
+.tailgate-holders__side {
+  width: fit-content;
+  border: 1px solid var(--pc-border);
+  padding: 3px 8px;
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-weight: 700;
+}
+
+.tailgate-holders__shares {
+  color: var(--pc-muted);
+  text-align: right;
+}
+
 [data-archetype='tailgate'] .vk-card {
-  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+  border-width: 2px;
+  background:
+    linear-gradient(95deg, rgba(255, 255, 255, 0.13), transparent 35% 70%, rgba(80, 54, 25, 0.07)),
+    var(--pc-inner);
+  box-shadow: 4px 5px 0 rgba(73, 67, 49, 0.16);
+  transition: transform 120ms ease, box-shadow 120ms ease;
 }
 
 [data-archetype='tailgate'] .vk-card:hover {
-  transform: translateY(-2px);
+  transform: translate(-1px, -2px) rotate(-0.15deg);
   border-color: var(--pc-accent);
+  box-shadow: 6px 7px 0 rgba(73, 67, 49, 0.2);
+}
+
+[data-archetype='tailgate'] .vk-card button {
+  min-height: 48px;
+  border: 2px solid var(--pc-border);
+  border-radius: 2px;
+  box-shadow: 0 4px 0 var(--pc-border);
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 80ms ease, box-shadow 80ms ease;
+}
+
+[data-archetype='tailgate'] .vk-card button:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--pc-border);
+}
+
+.tailgate-copy {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(260px, 0.65fr) minmax(0, 1.35fr);
+  gap: clamp(24px, 5vw, 64px);
+  padding: clamp(28px, 5vw, 58px);
+  border: 2px solid var(--pc-border);
+  background:
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(70, 101, 145, 0.13) 28px 29px),
+    #f7f0d9;
+  box-shadow: 7px 8px 0 rgba(73, 67, 49, 0.18);
+}
+
+.tailgate-copy::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -8px;
+  height: 12px;
+  background: linear-gradient(135deg, transparent 6px, #f7f0d9 0) 0 0 / 12px 12px repeat-x;
+}
+
+.tailgate-copy__intro {
+  align-self: start;
+}
+
+.tailgate-copy__tape {
+  display: inline-block;
+  margin: -10px 0 22px;
+  padding: 7px 16px;
+  background: rgba(243, 207, 91, 0.72);
+  color: var(--pc-text);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+
+.tailgate-copy h2,
+.tailgate-prompt h3 {
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  color: var(--pc-text);
+}
+
+.tailgate-copy h2 {
+  margin: 0;
+  font-size: clamp(2.1rem, 4.5vw, 4.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.tailgate-copy__intro > p {
+  max-width: 42ch;
+  margin: 20px 0 0;
+  color: var(--pc-muted);
+  line-height: 1.55;
+}
+
+.tailgate-copy__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.tailgate-copy__actions button,
+.tailgate-copy__actions a,
+.tailgate-prompt > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  border: 2px solid var(--pc-border);
+  border-radius: 2px;
+  padding: 0 18px;
+  font: inherit;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tailgate-copy__actions button {
+  background: var(--pc-accent);
+  color: var(--pc-onaccent);
+  box-shadow: 0 4px 0 var(--pc-border);
+}
+
+.tailgate-copy__actions a {
+  background: var(--pc-surface);
+  color: var(--pc-text);
+}
+
+.tailgate-copy__actions button:active,
+.tailgate-prompt > button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--pc-border);
+}
+
+.tailgate-copy__status {
+  display: block;
+  min-height: 1.2em;
+  margin-top: 10px;
+  color: var(--pc-danger);
+  font-size: 12px;
+}
+
+.tailgate-copy__cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.tailgate-prompt {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 20px;
+  border: 2px solid var(--pc-border);
+  background:
+    linear-gradient(100deg, rgba(255, 255, 255, 0.18), transparent 65%),
+    var(--pc-inner);
+  box-shadow: 4px 5px 0 rgba(73, 67, 49, 0.17);
+}
+
+.tailgate-prompt:nth-child(2) {
+  transform: rotate(0.7deg);
+}
+
+.tailgate-prompt > span {
+  color: var(--pc-accent);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tailgate-prompt h3 {
+  margin: 12px 0 8px;
+  font-size: 1.45rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.tailgate-prompt > p {
+  margin: 0 0 18px;
+  color: var(--pc-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.tailgate-prompt details {
+  margin-top: auto;
+  border-top: 1px dashed var(--pc-border);
+  padding-top: 12px;
+}
+
+.tailgate-prompt summary {
+  color: var(--pc-text);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.tailgate-prompt pre {
+  max-height: 260px;
+  overflow: auto;
+  white-space: pre-wrap;
+  margin: 12px 0 0;
+  color: var(--pc-text);
+  font: 11px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.tailgate-prompt > button {
+  width: 100%;
+  margin-top: 16px;
+  background: var(--pc-surface);
+  color: var(--pc-text);
+  box-shadow: 0 3px 0 var(--pc-border);
 }
 
 [data-archetype='tailgate'] button,
@@ -364,6 +670,43 @@ body {
 
   .venue-pst__claim {
     width: 100%;
+  }
+
+  .tailgate-copy {
+    grid-template-columns: 1fr;
+    padding: 26px 18px 34px;
+  }
+
+  .tailgate-copy__cards {
+    grid-template-columns: 1fr;
+  }
+
+  .tailgate-prompt:nth-child(2) {
+    transform: none;
+  }
+
+  .tailgate-copy__actions > * {
+    width: 100%;
+  }
+
+  .tailgate-holders__head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .tailgate-holders__list li {
+    grid-template-columns: 28px 1fr auto;
+    gap: calc(var(--pc-space) * 3);
+    padding-block: calc(var(--pc-space) * 2);
+  }
+
+  .tailgate-holders__side {
+    grid-column: 2;
+  }
+
+  .tailgate-holders__shares {
+    grid-column: 3;
+    grid-row: 1 / span 2;
   }
 }
 

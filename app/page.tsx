@@ -34,6 +34,91 @@ const chip = {
   background: 'transparent',
 } as const
 
+const VENUE_PROMPTS = [
+  {
+    title: 'The four-facts brief',
+    summary: 'The subject, name, audience, and scene that shape the whole venue.',
+    prompt: `I want to make a venue about American football, where fans make quick calls on games, players, and season outcomes.
+
+Call it The Tailgate. It should feel like a stadium parking lot two hours before kickoff, and it is for players.
+
+Build it by following https://docs.prophecyhosting.com/launch-a-venue.txt
+
+Tell me the scope-check number before you design anything. If it is 0, stop — we will fix the terms first. When you are done, run npm run shot and show me the PNGs.`,
+  },
+  {
+    title: 'The parking-lot direction',
+    summary: 'The daylight, plywood, cooler-lid visual language.',
+    prompt: `The app should feel like a stadium parking lot two hours before kickoff — daylight, grills going, folding chairs, hand-painted plywood signs with the spread chalked on them; loud, friendly, and a little sun-bleached.
+
+Use warm asphalt, faded sky blue, plywood tan, cooler red, parking stripes, marker lettering, picnic checks, and physical shadows. Avoid polished sportsbook or financial-dashboard styling.`,
+  },
+  {
+    title: 'The player interaction',
+    summary: 'The speed, tactility, and language of every call.',
+    prompt: `This venue is for players. Keep it mobile-first with one obvious decision at a time, big thumb targets, short copy, and almost no chrome.
+
+Every pick should feel like slapping 25 PST on a cooler lid, not filling in a form. Make outcome controls visibly pressable. Keep market content data-driven and preserve the venue kit's market, quote, predict, sell, and checkout wiring. Restyle and restructure freely; never rewire.`,
+  },
+] as const
+
+const FULL_VENUE_PROMPT = VENUE_PROMPTS.map(({ title, prompt }) => `${title}\n\n${prompt}`).join('\n\n---\n\n')
+
+function CopyVenueSection() {
+  const [copied, setCopied] = useState<string | null>(null)
+
+  async function copy(label: string, value: string) {
+    try {
+      await navigator.clipboard.writeText(value)
+      setCopied(label)
+      window.setTimeout(() => setCopied((current) => (current === label ? null : current)), 1800)
+    } catch {
+      setCopied('Copy failed')
+    }
+  }
+
+  return (
+    <section className="tailgate-copy">
+      <div className="tailgate-copy__intro">
+        <span className="tailgate-copy__tape">Tear off a copy</span>
+        <h2>Bring this tailgate to your lot.</h2>
+        <p>These are the three prompts behind the venue. Copy the full recipe or take one card at a time.</p>
+        <div className="tailgate-copy__actions">
+          <button type="button" onClick={() => void copy('all', FULL_VENUE_PROMPT)}>
+            {copied === 'all' ? 'Copied to clipboard' : 'Copy venue prompt'}
+          </button>
+          <a href="https://github.com/coconutwaterlover/the-tailgate" target="_blank" rel="noreferrer noopener">
+            View the source ↗
+          </a>
+        </div>
+        <span className="tailgate-copy__status" aria-live="polite">
+          {copied === 'Copy failed' ? 'Clipboard unavailable — open a prompt card and copy it manually.' : ''}
+        </span>
+      </div>
+
+      <div className="tailgate-copy__cards">
+        {VENUE_PROMPTS.map((item, index) => {
+          const label = `prompt-${index}`
+          return (
+            <article className="tailgate-prompt" key={item.title}>
+              <span>Prompt {index + 1}</span>
+              <h3>{item.title}</h3>
+              <p>{item.summary}</p>
+              <details>
+                <summary>Read the prompt</summary>
+                <pre>{item.prompt}</pre>
+              </details>
+              <button type="button" onClick={() => void copy(label, item.prompt)}>
+                {copied === label ? 'Copied' : 'Copy prompt'}
+              </button>
+            </article>
+          )
+        })}
+      </div>
+    </section>
+  )
+}
+
 // PositionsTable REQUIRES `wallet`; the current one lives on the Prophecy session. Same client-only
 // guard as WalletButton below and for the same reason — ProphecyProvider mounts after hydration
 // (see Providers), so calling useProphecy on the server render throws for want of its provider.
@@ -147,23 +232,23 @@ export default function Page() {
       <>
           <section className="tailgate-hero">
             <div className="tailgate-hero__copy">
-              <span className="tailgate-kicker">Testnet · Gates open</span>
-              <h1>Call the game<br />before kickoff.</h1>
-              <p>One decision at a time. Pick your side, put it on the record, and see who read the moment right.</p>
+              <span className="tailgate-kicker">Lot open · Two hours to kickoff</span>
+              <h1>Grab a chair.<br />Make the call.</h1>
+              <p>The grills are going and the signs are up. Pick your side, put it on the cooler, and let the whole lot know where you stand.</p>
             </div>
             <div className="tailgate-ticket" aria-label="How The Tailgate works">
-              <span className="tailgate-ticket__label">Your game plan</span>
-              <strong>Pick a call</strong>
-              <span>Take a position with 25 PST</span>
-              <span>Watch the crowd move</span>
-              <span>Come back for the result</span>
+              <span className="tailgate-ticket__label">Painted on the plywood</span>
+              <strong>Pick a side</strong>
+              <span>Slap 25 PST on the cooler</span>
+              <span>See where the lot is leaning</span>
+              <span>Come back when the whistle blows</span>
             </div>
           </section>
 
           <div className="tailgate-marquee" aria-label="Venue highlights">
-            <span>Live calls</span>
-            <span>Gasless predictions</span>
-            <span>Paper-money testnet</span>
+            <span>Grills hot</span>
+            <span>Chairs out</span>
+            <span>Calls live</span>
           </div>
 
           <GetPst />
@@ -172,8 +257,8 @@ export default function Page() {
             <section className="tailgate-section venue-lead">
               <div className="tailgate-section__head">
                 <span>01</span>
-                <h2>Make the call</h2>
-                <p>The crowd is forming. Where do you stand?</p>
+                <h2>Today’s big sign</h2>
+                <p>Someone chalked it up. Where do you stand?</p>
               </div>
               <FeaturedMarket event={lead} cardHref={(event) => marketPath(event.id, event.title ?? event.name, '/m')} />
             </section>
@@ -182,8 +267,8 @@ export default function Page() {
           <section className="tailgate-section">
             <div className="tailgate-section__head">
               <span>02</span>
-              <h2>More on the board</h2>
-              <p>Quick calls. Big targets. No playbook required.</p>
+              <h2>More around the lot</h2>
+              <p>Quick calls, hand-painted and ready for your name.</p>
             </div>
             <MarketGrid
               events={rest.slice(0, 7)}
@@ -198,8 +283,8 @@ export default function Page() {
           <section className="tailgate-competition">
             <div className="tailgate-section__head">
               <span>03</span>
-              <h2>Fans who saw it first</h2>
-              <p>Accuracy earns the bragging rights.</p>
+              <h2>Loudest in the lot</h2>
+              <p>Being right earns the folding-chair bragging rights.</p>
             </div>
             <MiniLeaderboard metric="edge" limit={5} />
           </section>
@@ -212,6 +297,8 @@ export default function Page() {
             </div>
             <MyPositions />
           </section>
+
+          <CopyVenueSection />
           {/* YOUR VENUE'S OWN LIVE SURFACES. Both need the numeric venue id you get from
               `prophecy venue create` — until then they would show the whole platform's trades under
               your brand, so they are off rather than wrong. Add `venueNo` and uncomment:

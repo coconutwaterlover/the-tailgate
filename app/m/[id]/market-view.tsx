@@ -1,8 +1,9 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { VenueShell, MarketDetail, ActivityFeed, ResolutionReceipt, ErrorState, Skeleton, useMarketDetailData } from '@prophecy-dev/venue-kit'
-import { Comments } from '@prophecy-dev/connect-react'
+import { VenueShell, MarketDetail, ActivityFeed, ResolutionReceipt, ErrorState, Skeleton, fmtWei, short, useMarketDetailData } from '@prophecy-dev/venue-kit'
+import { Comments, useConnect } from '@prophecy-dev/connect-react'
 
 /**
  * The detail page is where the FULL question belongs. The card showed the short title because a
@@ -44,6 +45,11 @@ export function MarketView({ id }: { id: string }) {
           <>
             <div className="tailgate-detail-kicker">Make your call</div>
             <MarketDetail marketId={id} event={asked} />
+            <WhoCalledIt
+              marketId={id}
+              outcomes={asked.outcomes}
+              decimals={asked.collateral?.decimals ?? 18}
+            />
             <h2 className="venue-section">What the crowd is saying</h2>
             <Comments subjectType="event" subjectRef={id} />
             {/* WHY a market resolved the way it did, with its sources. Works with no configuration at
@@ -60,6 +66,85 @@ export function MarketView({ id }: { id: string }) {
         )}
       </VenueShell>
     </div>
+  )
+}
+
+interface HolderRow {
+  wallet: string
+  outcomeIndex: number
+  shares: string
+  costBasis: string
+}
+
+function WhoCalledIt({
+  marketId,
+  outcomes,
+  decimals,
+}: {
+  marketId: string
+  outcomes: Array<{ index: number; label: string }>
+  decimals: number
+}) {
+  const client = useConnect()
+  const [holders, setHolders] = useState<HolderRow[]>([])
+  const [loading, setLoading] = useState(true)
+  const [failed, setFailed] = useState(false)
+
+  useEffect(() => {
+    let alive = true
+    setLoading(true)
+    setFailed(false)
+
+    client.markets.holders(marketId, { limit: 5 })
+      .then((result) => {
+        if (alive) setHolders(result.holders)
+      })
+      .catch(() => {
+        if (alive) setFailed(true)
+      })
+      .finally(() => {
+        if (alive) setLoading(false)
+      })
+
+    return () => {
+      alive = false
+    }
+  }, [client, marketId])
+
+  return (
+    <section className="tailgate-holders" aria-labelledby="tailgate-holders-title">
+      <div className="tailgate-holders__head">
+        <div>
+          <span>Cooler-side roll call</span>
+          <h2 id="tailgate-holders-title">Who called it?</h2>
+        </div>
+        <p>Top five positions on this call.</p>
+      </div>
+
+      {loading ? (
+        <div className="tailgate-holders__loading">
+          <Skeleton height={42} />
+          <Skeleton height={42} />
+        </div>
+      ) : failed ? (
+        <p className="tailgate-holders__empty">The roll call could not load. The market is still live.</p>
+      ) : holders.length === 0 ? (
+        <p className="tailgate-holders__empty">Nobody has put a call on the cooler yet. You could be first.</p>
+      ) : (
+        <ol className="tailgate-holders__list">
+          {holders.map((holder, index) => (
+            <li key={`${holder.wallet}-${holder.outcomeIndex}`}>
+              <span className="tailgate-holders__rank">{String(index + 1).padStart(2, '0')}</span>
+              <strong>{short(holder.wallet)}</strong>
+              <span className="tailgate-holders__side">
+                {outcomes.find((outcome) => outcome.index === holder.outcomeIndex)?.label ?? `Side ${holder.outcomeIndex + 1}`}
+              </span>
+              <span className="tailgate-holders__shares">{fmtWei(holder.shares, decimals)} shares</span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
   )
 }
 

@@ -54,22 +54,22 @@ const API_KEY = ""
 
 // The brand, emitted from the venue spec. ONE ProphecyTheme re-skins the entire kit.
 const THEME = {
-  "accent": "#f4c430",
-  "surface": "#0d1b14",
-  "inner": "#15281d",
-  "border": "#355442",
-  "text": "#f2f3e9",
-  "gain": "#65c466",
-  "yes": "#65c466",
-  "danger": "#ef6a62",
-  "no": "#ef6a62",
-  "radius": "3px",
+  "accent": "#c94d34",
+  "surface": "#f3ecd6",
+  "inner": "#d6b77d",
+  "border": "#615942",
+  "text": "#2d2d25",
+  "gain": "#2d7a51",
+  "yes": "#2d7a51",
+  "danger": "#b83a2f",
+  "no": "#b83a2f",
+  "radius": "2px",
   "brand": "The Tailgate",
-  "onAccent": "#0d1b14",
+  "onAccent": "#fff8e6",
   "zIndex": 9000
 } as const
 // MUST match the brand, or a dark brand renders gray-on-white under a light OS.
-const COLOR_SCHEME = "dark" as const
+const COLOR_SCHEME = "light" as const
 
 // THE CHAIN MUST MATCH THE NETWORK ABOVE. This was hardcoded to viem's `somnia` (5031, mainnet)
 // while API/GATEWAY switched on the venue's network — so a testnet venue read its markets from
