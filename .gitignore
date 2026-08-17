@@ -5,5 +5,5 @@ dist/
 .wrangler/
 .dev.vars
 
-# Holds your Prophecy access key.
-.npmrc
+.vercel
+.env*

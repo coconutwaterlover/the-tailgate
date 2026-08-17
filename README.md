@@ -100,6 +100,22 @@ shots/                        Generated visual checks
 Pricing, market truth, positions, resolution, and trading stay inside Prophecy Connect and Venue
 Kit. The venue never calculates prices, posts trades directly, or replaces the checkout flow.
 
+## Vercel deployment
+
+The production venue is available at [the-tailgate.vercel.app](https://the-tailgate.vercel.app).
+
+The project preserves Vinext for Prophecy's Cloudflare deployment path and adds a native Next.js
+build for Vercel:
+
+```bash
+npm run build:vercel
+vercel deploy --prebuilt --prod
+```
+
+Vercel uses the Next.js framework preset and `npm run build:vercel`. Add `NPM_TOKEN` to the Vercel
+project's build environment because the tracked `.npmrc` references it when installing Prophecy's
+restricted packages. Never put the token itself in the repository.
+
 ## Venue registration
 
 The local build intentionally has no venue key yet. Register it when you are ready:

@@ -6,23 +6,26 @@
     "dev": "vinext dev",
     "build": "vinext build",
     "start": "vinext start",
+    "build:vercel": "next build",
+    "start:vercel": "next start",
     "validate": "prophecy validate",
     "shot": "prophecy validate --shot",
     "deploy": "prophecy deploy",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@prophecy-dev/venue-kit": "^1.0.0",
+    "@privy-io/react-auth": "^3.34.0",
     "@prophecy-dev/connect-react": "^1.23.0",
     "@prophecy-dev/connect-sdk": "^1.19.0",
-    "@privy-io/react-auth": "^3.34.0",
-    "permissionless": "^0.2.57",
+    "@prophecy-dev/venue-kit": "^1.0.0",
+    "next": "^16.3.1",
     "ox": "^0.8.9",
+    "permissionless": "^0.2.57",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-server-dom-webpack": "^19.2.6",
-    "vinext": "latest",
-    "viem": "^2.55.4"
+    "viem": "^2.55.4",
+    "vinext": "latest"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "latest",
