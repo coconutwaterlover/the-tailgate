@@ -73,7 +73,25 @@ Every pick should feel like slapping 25 PST on a cooler lid, not filling in a fo
   },
 ] as const
 
-const FULL_VENUE_PROMPT = VENUE_PROMPTS.map(({ title, prompt }) => `${title}\n\n${prompt}`).join('\n\n---\n\n')
+const GO_LIVE_COMMANDS = `prophecy login
+
+prophecy venue create "The Tailgate"
+
+prophecy deploy --key pck_… --venue the-tailgate`
+
+const GO_LIVE_CARD = {
+  title: 'Put it on the lot',
+  summary:
+    'Create the venue, save the one-time key, and deploy. Sign-in works on *.venues.prophecyhosting.com — no Privy dashboard change.',
+  prompt: `After the venue is built, put it live on Prophecy hosting. The key prints ONCE — save it. The folder name is the hostname: the-tailgate.venues.prophecyhosting.com.
+
+${GO_LIVE_COMMANDS}`,
+} as const
+
+const FULL_VENUE_PROMPT = [
+  ...VENUE_PROMPTS.map(({ title, prompt }) => `${title}\n\n${prompt}`),
+  `${GO_LIVE_CARD.title}\n\n${GO_LIVE_CARD.prompt}`,
+].join('\n\n---\n\n')
 
 function TailgateEmpty({ title, message }: { title: string; message: string }) {
   return (
@@ -103,10 +121,20 @@ function CopyVenueSection() {
       <div className="tailgate-copy__intro">
         <span className="tailgate-copy__tape">Tear off a copy</span>
         <h2>Bring this tailgate to your lot.</h2>
-        <p>These are the three prompts behind the venue. Copy the full recipe or take one card at a time.</p>
+        <p>
+          These are the three prompts behind the venue, plus the commands that create it and put it
+          live. Copy the full recipe or take one card at a time.
+        </p>
         <div className="tailgate-copy__actions">
           <button type="button" onClick={() => void copy('all', FULL_VENUE_PROMPT)}>
             {copied === 'all' ? 'Copied to clipboard' : 'Copy venue prompt'}
+          </button>
+          <button
+            type="button"
+            className="tailgate-copy__secondary"
+            onClick={() => void copy('deploy', GO_LIVE_COMMANDS)}
+          >
+            {copied === 'deploy' ? 'Copied to clipboard' : 'Copy go-live commands'}
           </button>
           <a href="https://github.com/coconutwaterlover/the-tailgate" target="_blank" rel="noreferrer noopener">
             View the source ↗
@@ -135,6 +163,18 @@ function CopyVenueSection() {
             </article>
           )
         })}
+        <article className="tailgate-prompt tailgate-prompt--live">
+          <span>Go live</span>
+          <h3>{GO_LIVE_CARD.title}</h3>
+          <p>{GO_LIVE_CARD.summary}</p>
+          <details open>
+            <summary>Read the commands</summary>
+            <pre>{GO_LIVE_COMMANDS}</pre>
+          </details>
+          <button type="button" onClick={() => void copy('deploy', GO_LIVE_COMMANDS)}>
+            {copied === 'deploy' ? 'Copied' : 'Copy commands'}
+          </button>
+        </article>
       </div>
     </section>
   )

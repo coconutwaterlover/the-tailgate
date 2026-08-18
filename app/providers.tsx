@@ -50,7 +50,7 @@ if (somniaTestnet.id !== NET.chainId) {
 // stays quiet. A generated venue that has not been issued a key is the second case — there is no
 // env var its operator forgot to set — so `undefined` would put a warning in the console of every
 // such venue with nothing anyone could do about it.
-const API_KEY = ""
+const API_KEY = "pck_f952278e61adc38951e3a423a8636f345fee7b605aef0162e847a44805cf3b1a"
 
 // The brand, emitted from the venue spec. ONE ProphecyTheme re-skins the entire kit.
 const THEME = {

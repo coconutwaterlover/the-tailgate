@@ -911,6 +911,11 @@ body {
   box-shadow: 0 4px 0 var(--pc-border);
 }
 
+.tailgate-copy__actions .tailgate-copy__secondary {
+  background: var(--pc-surface);
+  color: var(--pc-text);
+}
+
 .tailgate-copy__actions a {
   background: var(--pc-surface);
   color: var(--pc-text);
@@ -950,6 +955,20 @@ body {
 
 .tailgate-prompt:nth-child(2) {
   transform: rotate(0.7deg);
+}
+
+.tailgate-prompt--live {
+  grid-column: 1 / -1;
+  transform: rotate(-0.35deg);
+}
+
+.tailgate-prompt--live pre {
+  max-height: none;
+  padding: 12px 14px;
+  border: 1px dashed var(--pc-border);
+  background: var(--pc-surface);
+  font-size: 12px;
+  line-height: 1.6;
 }
 
 .tailgate-prompt > span {
@@ -1102,7 +1121,8 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .tailgate-prompt:nth-child(2) {
+  .tailgate-prompt:nth-child(2),
+  .tailgate-prompt--live {
     transform: none;
   }
 
