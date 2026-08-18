@@ -5,7 +5,7 @@ import { PrivyProvider, useIdentityToken, usePrivy, useWallets } from '@privy-io
 import { SmartWalletsProvider, useSmartWallets } from '@privy-io/react-auth/smart-wallets'
 import { createPublicClient, http } from 'viem'
 import { somniaTestnet } from 'viem/chains'
-import { ConnectProvider, ProphecyCheckout, ProphecyProvider, type Wallet } from '@prophecy-dev/connect-react'
+import { ConnectProvider, ProphecyCheckout, ProphecyConfirm, ProphecyProvider, type Wallet } from '@prophecy-dev/connect-react'
 import { NETWORKS, pst, type ChainReader } from '@prophecy-dev/connect-sdk'
 
 // ONE NAME FOR THE NETWORK, and everything else derived from it.
@@ -138,6 +138,8 @@ function WithPrivy({ children }: { children: ReactNode }) {
       {children}
       {/* The {c} drawer — mount once, or predict silently no-ops. */}
       <ProphecyCheckout />
+      {/* Winnings claims use this confirm, not the trade drawer. Without it, ClaimSheet hides its button. */}
+      <ProphecyConfirm />
     </ProphecyProvider>
   )
 }

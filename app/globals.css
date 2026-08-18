@@ -77,6 +77,7 @@ body {
 
 [data-archetype='tailgate'] .vk-shell__bar {
   min-height: 68px;
+  flex-wrap: wrap;
 }
 
 .tailgate-header__identity {
@@ -137,6 +138,26 @@ body {
   display: flex;
   align-items: center;
   margin-left: auto;
+}
+
+.tailgate-header__session {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.tailgate-wallet-balance {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.tailgate-header__wallet .pc-wal__claim {
+  border-radius: var(--pc-radius);
+  font-weight: 800;
+  box-shadow: 0 3px 0 var(--pc-border);
 }
 
 [data-archetype='tailgate'] .vk-shell__main {
@@ -334,25 +355,51 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: calc(var(--pc-space) * 4);
-  margin-top: calc(var(--pc-space) * -7);
-  padding: calc(var(--pc-space) * 4) calc(var(--pc-space) * 6);
-  border: 1px solid var(--pc-border);
-  background: var(--pc-inner);
-  color: var(--pc-muted);
-  font-size: 0.85rem;
+  padding: calc(var(--pc-space) * 5) calc(var(--pc-space) * 6);
+  border: 3px solid var(--pc-border);
+  background:
+    linear-gradient(92deg, rgba(255, 255, 255, 0.13), transparent 28% 72%, rgba(80, 54, 25, 0.08)),
+    var(--pc-inner);
+  color: var(--pc-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  box-shadow: 6px 7px 0 rgba(73, 67, 49, 0.16);
 }
 
 .venue-pst__claim {
-  min-height: 42px;
-  border: 0;
+  min-height: 48px;
+  border: 2px solid var(--pc-border);
   border-radius: var(--pc-radius);
   padding: 0 calc(var(--pc-space) * 6);
   background: var(--pc-accent);
   color: var(--pc-onaccent);
   font: inherit;
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-size: 1.05rem;
   font-weight: 800;
   cursor: pointer;
+  box-shadow: 0 4px 0 var(--pc-border);
+  transition: transform 80ms ease, box-shadow 80ms ease;
+}
+
+.venue-pst__claim:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--pc-border);
+}
+
+.venue-pst__claim:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.venue-pst__error {
+  color: var(--pc-danger);
+}
+
+.venue-pst__ok {
+  color: var(--pc-gain);
 }
 
 .tailgate-footer {
@@ -1037,6 +1084,13 @@ body {
 
   .tailgate-header__identity {
     gap: 4px;
+    flex: 1 1 auto;
+  }
+
+  .tailgate-header__wallet {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-end;
   }
 
   .tailgate-header__tower {

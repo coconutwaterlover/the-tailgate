@@ -12,12 +12,14 @@ import {
   FeaturedMarket,
   EmptyState,
   pickFeatured,
+  fmtWei,
   type PositionRow,
 } from '@prophecy-dev/venue-kit'
 // THIS VENUE'S OWN MARKETS. Not useMarketBrowse/useEvents — those read every market on the
 // platform, and this venue is a VIEW over the pool, not the pool.
 import { useVenueMarkets } from './venue-markets'
 import { TailgateHeader } from './components/tailgate-header'
+import { WalletButton } from './components/tailgate-session'
 
 
 // Composed over @prophecy-dev/venue-kit.
@@ -33,17 +35,6 @@ import { TailgateHeader } from './components/tailgate-header'
 // A short title that names nothing ("Exact score") is a CONTENT bug and is fixed where it is
 // written. An earlier version of this file second-guessed the title with a heuristic; it mis-fired
 // on perfectly good ones ("Toluca match winner", "Marriott total rooms") and is gone.
-
-const chip = {
-  font: 'inherit',
-  fontSize: 12,
-  padding: '4px 10px',
-  cursor: 'pointer',
-  color: 'var(--pc-text)',
-  border: '1px solid var(--pc-border)',
-  borderRadius: 'var(--pc-radius)',
-  background: 'transparent',
-} as const
 
 const VENUE_PROMPTS = [
   {
@@ -275,47 +266,43 @@ function GetPst() {
 
 function GetPstInner() {
   const { authenticated } = usePrivy()
+  const { isReady } = useProphecy()
   const grant = useStarterGrant()
   const drip = useDailyDrip()
+  const [landed, setLanded] = useState(false)
   // An offer that cannot be accepted is worse than silence: both claims need a wallet.
   if (!authenticated) return null
+  const showGrant = grant.enabled && !grant.granted
+  const showDrip = drip.claimable || drip.claiming
+  const showError = Boolean(grant.error || drip.error)
   // `enabled: false` is the admin switch for "there is no grant" — so promise nothing.
-  if (!grant.enabled && !drip.claimable) return null
+  if (!showGrant && !showDrip && !showError && !landed) return null
+  const dripLabel =
+    drip.amount > 0n ? `Claim today’s ${fmtWei(drip.amount)} PST` : 'Claim today’s PST'
   return (
     <section className="venue-pst">
-      {grant.enabled && !grant.granted ? <span>Your starting PST is on its way.</span> : null}
-      {drip.claimable ? (
-        <button type="button" className="venue-pst__claim" disabled={drip.claiming} onClick={() => void drip.claim()}>
-          {drip.claiming ? 'Claiming…' : 'Claim today’s PST'}
+      {showGrant ? <span>Your starting PST is on its way.</span> : null}
+      {landed && !showDrip ? <span className="venue-pst__ok">Today’s PST is on the cooler.</span> : null}
+      {showError ? (
+        <span className="venue-pst__error" role="alert">
+          Couldn’t drop the PST. Try the claim again.
+        </span>
+      ) : null}
+      {showDrip ? (
+        <button
+          type="button"
+          className="venue-pst__claim"
+          disabled={drip.claiming || !isReady}
+          onClick={() => {
+            void drip.claim().then((ok) => {
+              if (ok) setLanded(true)
+            })
+          }}
+        >
+          {drip.claiming ? 'Claiming…' : !isReady ? 'Wallet warming up…' : dripLabel}
         </button>
       ) : null}
     </section>
-  )
-}
-
-function WalletButton() {
-  // Privy mounts client-only (see Providers), so this cannot call usePrivy on the server or on the
-  // first client render — the hook throws without its provider above it.
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
-  if (!mounted) return null
-  return <WalletButtonInner />
-}
-
-function WalletButtonInner() {
-  const { ready, authenticated, login, logout, user } = usePrivy()
-  if (!ready) return null
-  const addr =
-    (user?.linkedAccounts?.find((a) => (a as { type?: string }).type === 'smart_wallet') as { address?: string } | undefined)
-      ?.address ?? null
-  return authenticated ? (
-    <button onClick={() => void logout()} style={chip}>
-      {addr ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : 'Signed in'} · Sign out
-    </button>
-  ) : (
-    <button onClick={() => login()} style={{ ...chip, background: 'var(--pc-accent)', color: 'var(--pc-onaccent)' }}>
-      Sign in
-    </button>
   )
 }
 
