@@ -56,20 +56,23 @@ body {
 }
 
 [data-archetype='tailgate'] {
+  --tailgate-field: color-mix(in srgb, var(--pc-gain) 46%, var(--pc-surface));
   min-height: 100vh;
   background:
-    repeating-linear-gradient(104deg, transparent 0 210px, rgba(255, 255, 255, 0.38) 212px 218px, transparent 220px 430px),
-    linear-gradient(rgba(70, 66, 54, 0.06), rgba(70, 66, 54, 0.06));
-  background-color: #d4d0c2;
+    repeating-linear-gradient(90deg, transparent 0 124px, color-mix(in srgb, var(--pc-border) 7%, transparent) 124px 248px),
+    var(--tailgate-field);
 }
 
 [data-archetype='tailgate'] .vk-shell {
   background:
-    repeating-linear-gradient(103deg, transparent 0 218px, color-mix(in srgb, var(--pc-onaccent) 42%, transparent) 220px 226px, transparent 228px 450px),
     radial-gradient(circle at 14% 22%, color-mix(in srgb, var(--pc-border) 7%, transparent) 0 1px, transparent 2px),
     radial-gradient(circle at 78% 64%, color-mix(in srgb, var(--pc-border) 8%, transparent) 0 1px, transparent 2px),
-    color-mix(in srgb, var(--pc-surface) 74%, var(--pc-border));
-  background-size: auto, 21px 21px, 27px 27px, auto;
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--tailgate-field) 96%, var(--pc-onaccent)) 0 132px,
+      color-mix(in srgb, var(--tailgate-field) 92%, var(--pc-border)) 132px 264px
+    );
+  background-size: 21px 21px, 27px 27px, auto;
 }
 
 [data-archetype='tailgate'] .vk-shell__bar {
