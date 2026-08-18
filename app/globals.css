@@ -163,7 +163,7 @@ body {
 
 [data-archetype='tailgate'] .vk-shell__main {
   display: grid;
-  gap: calc(var(--pc-space) * 14);
+  gap: calc(var(--pc-space) * 10);
 }
 
 .tailgate-hero {
@@ -172,11 +172,10 @@ body {
   grid-template-columns: minmax(0, 1.45fr) minmax(240px, 0.55fr);
   gap: calc(var(--pc-space) * 10);
   align-items: end;
-  min-height: 280px;
   overflow: hidden;
   border: 2px solid var(--pc-border);
   border-radius: var(--pc-radius);
-  padding: clamp(20px, 4vw, 48px);
+  padding: clamp(18px, 3vw, 36px);
   background:
     radial-gradient(circle at 84% 12%, rgba(255, 235, 146, 0.95), transparent 18%),
     linear-gradient(to bottom, #acd4df 0 47%, #c9c4b5 47% 100%);
@@ -215,7 +214,7 @@ body {
   max-width: 780px;
   margin: 0 0 16px;
   font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
-  font-size: clamp(3rem, 7.3vw, 7rem);
+  font-size: clamp(2.4rem, 5.4vw, 5.2rem);
   line-height: 0.88;
   letter-spacing: -0.045em;
   text-transform: uppercase;
@@ -302,6 +301,126 @@ body {
 
 .tailgate-headcount__label {
   font-variant-numeric: tabular-nums;
+}
+
+.tailgate-games {
+  display: grid;
+  gap: calc(var(--pc-space) * 3);
+}
+
+.tailgate-games__label {
+  width: fit-content;
+  color: var(--pc-muted);
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+
+.tailgate-games__chips {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: calc(var(--pc-space) * 3);
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.tailgate-games__chips::-webkit-scrollbar {
+  display: none;
+}
+
+.tailgate-games__chips button {
+  flex: 0 0 auto;
+  min-height: 44px;
+  border: 2px dashed var(--pc-border);
+  border-radius: 2px;
+  padding: 0 calc(var(--pc-space) * 4);
+  background:
+    linear-gradient(96deg, rgba(255, 255, 255, 0.13), transparent 55%),
+    var(--pc-inner);
+  color: var(--pc-text);
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-size: 1rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 2px 3px 0 color-mix(in srgb, var(--pc-border) 22%, transparent);
+}
+
+.tailgate-games__chips button[aria-pressed='true'] {
+  border-style: solid;
+  background: var(--pc-accent);
+  color: var(--pc-onaccent);
+  box-shadow: 0 3px 0 var(--pc-border);
+}
+
+.tailgate-queue {
+  display: grid;
+  gap: calc(var(--pc-space) * 5);
+}
+
+.tailgate-queue__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--pc-space) * 4);
+}
+
+.tailgate-queue__nav span {
+  color: var(--pc-muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tailgate-queue__nav button {
+  min-height: 48px;
+  border: 2px solid var(--pc-border);
+  border-radius: 2px;
+  padding: 0 calc(var(--pc-space) * 5);
+  background: var(--pc-surface);
+  color: var(--pc-text);
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--pc-border);
+}
+
+.tailgate-queue__next {
+  background: var(--pc-accent);
+  color: var(--pc-onaccent);
+}
+
+.tailgate-queue__nav button:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--pc-border);
+}
+
+.tailgate-queue__nav button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.tailgate-more {
+  justify-self: start;
+  min-height: 48px;
+  border: 2px dashed var(--pc-border);
+  border-radius: 2px;
+  padding: 0 calc(var(--pc-space) * 6);
+  background: var(--pc-inner);
+  color: var(--pc-text);
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 3px 4px 0 color-mix(in srgb, var(--pc-border) 22%, transparent);
+}
+
+.tailgate-more--quiet {
+  border-style: solid;
+  background: var(--pc-surface);
 }
 
 .tailgate-chatter {
@@ -1347,6 +1466,21 @@ body {
   .tailgate-chatter {
     margin-top: calc(var(--pc-space) * -5);
     padding-inline: calc(var(--pc-space) * 3);
+  }
+
+  .tailgate-queue__nav {
+    flex-wrap: wrap;
+  }
+
+  .tailgate-queue__nav button,
+  .tailgate-more {
+    width: 100%;
+  }
+
+  .tailgate-queue__nav span {
+    width: 100%;
+    text-align: center;
+    order: -1;
   }
 
   .tailgate-section__head {

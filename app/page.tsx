@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
 import { useDailyDrip, useProphecy, useStarterGrant } from '@prophecy-dev/connect-react'
 import {
@@ -9,9 +9,7 @@ import {
   marketPath,
   MiniLeaderboard,
   PositionsTable,
-  FeaturedMarket,
   EmptyState,
-  pickFeatured,
   fmtWei,
   type PositionRow,
 } from '@prophecy-dev/venue-kit'
@@ -23,7 +21,17 @@ import { TailgateOtherLots } from './components/tailgate-other-lots'
 import { WalletButton } from './components/tailgate-session'
 import { LotHeadcount } from './components/lot-headcount'
 import { LotChatter } from './components/lot-chatter'
+import { LotGames } from './components/lot-games'
+import { LotQueue } from './components/lot-queue'
 import { crowdPresence, pickTotal, shouldPreviewSampleCrowd, type CrowdEvent } from './crowd'
+import {
+  decorateBoard,
+  filterByGame,
+  gameChips,
+  MORE_STACK,
+  shouldPreviewBoard,
+  type BoardEvent,
+} from './board'
 
 
 // Composed over @prophecy-dev/venue-kit.
@@ -87,6 +95,41 @@ const FULL_VENUE_PROMPT = [
   ...VENUE_PROMPTS.map(({ title, prompt }) => `${title}\n\n${prompt}`),
   `${GO_LIVE_CARD.title}\n\n${GO_LIVE_CARD.prompt}`,
 ].join('\n\n---\n\n')
+
+function useCallBoard(events: readonly BoardEvent[]) {
+  const [preview, setPreview] = useState(false)
+  useEffect(() => {
+    setPreview(shouldPreviewBoard())
+  }, [])
+  const board = useMemo(() => decorateBoard(events, preview), [events, preview])
+  const games = useMemo(() => gameChips(board), [board])
+  const [game, setGame] = useState<string | null>(null)
+  const calls = useMemo(() => filterByGame(board, game), [board, game])
+  const [index, setIndex] = useState(0)
+  const [openLot, setOpenLot] = useState(false)
+
+  useEffect(() => {
+    setIndex(0)
+    setOpenLot(false)
+  }, [game, calls.length])
+
+  const current = calls[index] ?? null
+  const more = calls.filter((event) => event.id !== current?.id)
+  const visibleMore = openLot ? more : more.slice(0, MORE_STACK)
+
+  return {
+    games,
+    game,
+    setGame,
+    calls,
+    index,
+    setIndex,
+    more,
+    visibleMore,
+    openLot,
+    setOpenLot,
+  }
+}
 
 function useLotCrowd(events: readonly CrowdEvent[], loading: boolean) {
   const [previewSample, setPreviewSample] = useState(false)
@@ -323,10 +366,9 @@ export default function Page() {
   const all = useVenueMarkets()
   const loading = all.loading
   const events = all.events
-  const lead = events.length ? pickFeatured(events, "volume") : null
-  // the hero must not also appear in the list beneath it
-  const rest = lead ? events.filter((e) => e.id !== lead.id) : events
   const crowd = useLotCrowd(events, loading)
+  const board = useCallBoard(events)
+  const extraCalls = board.more.length - board.visibleMore.length
 
   return (
     <div data-density="sparse" data-archetype="tailgate">
@@ -365,35 +407,54 @@ export default function Page() {
 
           <GetPst />
 
-          {lead && (
-            <section className="tailgate-section venue-lead">
-              <div className="tailgate-section__head">
-                <span>01</span>
-                <h2>Today’s big sign</h2>
-                <p>Someone chalked it up. Where do you stand?</p>
-              </div>
-              <FeaturedMarket event={lead} cardHref={(event) => marketPath(event.id, event.title ?? event.name, '/m')} />
-            </section>
-          )}
-
-          <section className="tailgate-section">
+          <section className="tailgate-section venue-lead">
             <div className="tailgate-section__head">
-              <span>02</span>
-              <h2>More around the lot</h2>
-              <p>Quick calls, hand-painted and ready for your name.</p>
+              <span>01</span>
+              <h2>Today’s big sign</h2>
+              <p>One call on the cooler. Next when you’re ready.</p>
             </div>
-            <MarketGrid
-              events={rest.slice(0, 7)}
-              loading={loading}
-              variant="list"
+            <LotGames games={board.games} selected={board.game} onSelect={board.setGame} />
+            <LotQueue
+              calls={board.calls}
+              index={board.index}
+              onIndex={board.setIndex}
               emptyState={
                 <TailgateEmpty
                   title="The plywood is blank"
                   message="Check back when the next call gets chalked up."
                 />
               }
+            />
+          </section>
+
+          <section className="tailgate-section">
+            <div className="tailgate-section__head">
+              <span>02</span>
+              <h2>More around the lot</h2>
+              <p>A short stack. Flip through the rest when you want them.</p>
+            </div>
+            <MarketGrid
+              events={board.visibleMore}
+              loading={loading}
+              variant="list"
+              emptyState={
+                <TailgateEmpty
+                  title="That’s the lot for now"
+                  message="This call’s the one on the cooler. Next call when you’re ready."
+                />
+              }
               cardHref={(event) => marketPath(event.id, event.title ?? event.name, '/m')}
             />
+            {extraCalls > 0 ? (
+              <button type="button" className="tailgate-more" onClick={() => board.setOpenLot(true)}>
+                See more calls
+              </button>
+            ) : null}
+            {board.openLot && board.more.length > MORE_STACK ? (
+              <button type="button" className="tailgate-more tailgate-more--quiet" onClick={() => board.setOpenLot(false)}>
+                That’s enough
+              </button>
+            ) : null}
           </section>
 
           <section className="tailgate-competition">
