@@ -21,7 +21,13 @@ function LightTower({ side }: { side: 'left' | 'right' }) {
   )
 }
 
-export function TailgateHeader({ walletSlot }: { walletSlot?: ReactNode }) {
+export function TailgateHeader({
+  walletSlot,
+  presence,
+}: {
+  walletSlot?: ReactNode
+  presence?: ReactNode
+}) {
   return (
     <>
       <div className="tailgate-header__identity">
@@ -29,6 +35,7 @@ export function TailgateHeader({ walletSlot }: { walletSlot?: ReactNode }) {
         <div className="tailgate-header__copy">
           <strong>The Tailgate</strong>
           <span>Lot open · Two hours to kickoff</span>
+          {presence}
         </div>
         <LightTower side="right" />
       </div>

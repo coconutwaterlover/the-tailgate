@@ -19,7 +19,11 @@ import {
 // platform, and this venue is a VIEW over the pool, not the pool.
 import { useVenueMarkets } from './venue-markets'
 import { TailgateHeader } from './components/tailgate-header'
+import { TailgateOtherLots } from './components/tailgate-other-lots'
 import { WalletButton } from './components/tailgate-session'
+import { LotHeadcount } from './components/lot-headcount'
+import { LotChatter } from './components/lot-chatter'
+import { crowdPresence, pickTotal, shouldPreviewSampleCrowd, type CrowdEvent } from './crowd'
 
 
 // Composed over @prophecy-dev/venue-kit.
@@ -83,6 +87,15 @@ const FULL_VENUE_PROMPT = [
   ...VENUE_PROMPTS.map(({ title, prompt }) => `${title}\n\n${prompt}`),
   `${GO_LIVE_CARD.title}\n\n${GO_LIVE_CARD.prompt}`,
 ].join('\n\n---\n\n')
+
+function useLotCrowd(events: readonly CrowdEvent[], loading: boolean) {
+  const [previewSample, setPreviewSample] = useState(false)
+  useEffect(() => {
+    setPreviewSample(shouldPreviewSampleCrowd())
+  }, [])
+  const emptyBoard = !loading && pickTotal(events) === 0
+  return crowdPresence(events, previewSample && emptyBoard)
+}
 
 function TailgateEmpty({ title, message }: { title: string; message: string }) {
   return (
@@ -313,11 +326,19 @@ export default function Page() {
   const lead = events.length ? pickFeatured(events, "volume") : null
   // the hero must not also appear in the list beneath it
   const rest = lead ? events.filter((e) => e.id !== lead.id) : events
+  const crowd = useLotCrowd(events, loading)
 
   return (
     <div data-density="sparse" data-archetype="tailgate">
     <VenueShell
-      header={<TailgateHeader walletSlot={<WalletButton />} />}
+      header={
+        <TailgateHeader
+          walletSlot={<WalletButton />}
+          presence={
+            <LotHeadcount picks={crowd.picks} showCount={crowd.showCount} loading={loading} compact />
+          }
+        />
+      }
       footer={
         <div className="tailgate-footer">
           <span>The Tailgate</span>
@@ -340,11 +361,7 @@ export default function Page() {
             </div>
           </section>
 
-          <div className="tailgate-marquee" aria-label="Venue highlights">
-            <span>Grills hot</span>
-            <span>Chairs out</span>
-            <span>Calls live</span>
-          </div>
+          <LotChatter lines={crowd.lines} />
 
           <GetPst />
 
@@ -407,6 +424,7 @@ export default function Page() {
           </section>
 
           <CopyVenueSection />
+          <TailgateOtherLots />
           {/* YOUR VENUE'S OWN LIVE SURFACES. Both need the numeric venue id you get from
               `prophecy venue create` — until then they would show the whole platform's trades under
               your brand, so they are off rather than wrong. Add `venueNo` and uncomment:

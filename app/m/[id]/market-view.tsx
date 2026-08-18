@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { VenueShell, MarketDetail, ActivityFeed, ResolutionReceipt, EmptyState, ErrorState, Skeleton, fmtWei, short, useMarketDetailData } from '@prophecy-dev/venue-kit'
 import { Comments, useConnect } from '@prophecy-dev/connect-react'
 import { TailgateHeader } from '../../components/tailgate-header'
+import { TailgateOtherLots } from '../../components/tailgate-other-lots'
 import { WalletButton } from '../../components/tailgate-session'
 
 function TailgateEmpty({ title, message }: { title: string; message: string }) {
@@ -87,6 +88,7 @@ export function MarketView({ id }: { id: string }) {
             <ResolutionNotes market={asked} />
           </>
         )}
+        <TailgateOtherLots />
       </VenueShell>
     </div>
   )
