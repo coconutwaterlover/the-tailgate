@@ -6,8 +6,6 @@ folding chairs, hand-painted plywood, and calls made on a cooler lid.
 
 Grab a chair. Make the call.
 
-![The Tailgate homepage](shots/desktop.png)
-
 Live on [the-tailgate.vercel.app](https://the-tailgate.vercel.app). Source lives at
 [github.com/coconutwaterlover/the-tailgate](https://github.com/coconutwaterlover/the-tailgate).
 
