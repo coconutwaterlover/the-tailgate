@@ -54,7 +54,7 @@ export const SAMPLE_CROWD_EVENTS: CrowdEvent[] = [
   },
 ]
 
-const NFL_NICKNAMES = new Set([
+export const NFL_NICKNAMES = new Set([
   'Cardinals',
   'Falcons',
   'Ravens',
