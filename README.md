@@ -49,8 +49,13 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000). The Privy app used for sign-in must allow that
 exact origin, including the port.
 
-The venue runs on Somnia testnet. After you sign in, starter PST can auto-claim and a daily drip is
-available to claim by hand.
+The venue runs on **Somnia mainnet** (chain 5031). One word switches it — `NETWORK` in
+`app/providers.tsx` — and the API host, gateway, viem chain and trade contracts all follow from it.
+
+Mainnet PST is real, so the testnet faucet is not part of this build: the starter grant and daily
+drip in `GetPst` render nothing unless the network actually offers them. A visitor needs PST in their
+wallet before they can predict. Set `NETWORK = "testnet"` to get the self-service claims back for
+local work.
 
 ## Verify
 

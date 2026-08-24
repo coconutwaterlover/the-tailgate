@@ -311,6 +311,15 @@ function PositionTicket({ row }: { row: PositionRow }) {
  * Both send from the visitor's OWN sponsored smart wallet, so this needs no key and no backend — the
  * contract enforces the once-only and the cooldown itself.
  *
+ * BOTH CLAIMS ARE TESTNET FURNITURE, and this venue now runs on MAINNET, where collateral is real and
+ * a visitor arrives with none. Nothing here needs deleting for that: `enabled: false` and a
+ * non-claimable drip are exactly the "say nothing" case the guards below already handle, so a mainnet
+ * grant that is switched off renders an empty section rather than a promise the chain will not keep.
+ * Leave it mounted — it costs nothing and switching `NETWORK` back restores it. But do not read this
+ * section as the venue's answer to "how do I get PST" any more: on mainnet that is an operator errand
+ * (fund the wallets, or ask Connect what the mainnet grant is set to), not a code change. Check it on
+ * a real signed-in wallet before a demo; the venue cannot tell you from here.
+ *
  * RESTYLE THIS FREELY, like any page code. Just do not make the drip automatic.
  */
 function GetPst() {

@@ -4,7 +4,7 @@ import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import { PrivyProvider, useIdentityToken, usePrivy, useWallets } from '@privy-io/react-auth'
 import { SmartWalletsProvider, useSmartWallets } from '@privy-io/react-auth/smart-wallets'
 import { createPublicClient, http } from 'viem'
-import { somniaTestnet } from 'viem/chains'
+import { somnia, somniaTestnet } from 'viem/chains'
 import { ConnectProvider, ProphecyCheckout, ProphecyConfirm, ProphecyProvider, type Wallet } from '@prophecy-dev/connect-react'
 import { NETWORKS, pst, type ChainReader } from '@prophecy-dev/connect-sdk'
 
@@ -19,7 +19,7 @@ import { NETWORKS, pst, type ChainReader } from '@prophecy-dev/connect-sdk'
 // for exactly this: "a venue carries five things that must agree, and holding four of them in four
 // places is what produced four separate renders-fine-talks-to-the-wrong-server incidents". Switching
 // this venue between networks is now ONE word.
-const NETWORK = "testnet" as const
+const NETWORK = "mainnet" as const
 const NET = NETWORKS[NETWORK]
 const API = NET.apiUrl
 const GATEWAY = NET.gatewayUrl
@@ -34,12 +34,23 @@ const READ_VENUE_ID = "the-tailgate"
 // doesn't need to be: ONE Privy app serves both networks, it is already configured for both, and
 // nothing here changes when `NETWORK` does. Nobody needs to check.
 const PRIVY_APP_ID = "cmo2sszq800qd0bl7mqtdv4zp"
-// THE CHAIN IS THE ONE THING STILL WRITTEN TWICE, because viem wants an object and `NET` carries an
-// id. So it is asserted rather than trusted: a chain that does not match the network fails at import
-// with a message naming both, instead of a venue that reads one chain and signs on another.
-if (somniaTestnet.id !== NET.chainId) {
+// THE CHAIN, and it is now DERIVED from `NETWORK` like everything else rather than written a second
+// time. viem wants a chain object and `NET` carries only an id, so the one word above cannot pick the
+// object on its own — but a two-row map next to it can, and that is the whole difference between
+// switching this venue with one edit and switching it with two.
+//
+// It was a standalone `somniaTestnet` import used at five sites (reader, executor, Privy's
+// defaultChain and supportedChains, plus the assert). Porting to mainnet meant finding all five; the
+// failure when you find four is the one the note below describes — the board fills, the venue looks
+// right, and the checkout silently never opens.
+//
+// The assert stays, because a map can still be wrong: a chain whose id does not match the network
+// fails at import with a message naming both, instead of a venue that reads one chain and signs on
+// another.
+const CHAIN = NETWORK === 'mainnet' ? somnia : somniaTestnet
+if (CHAIN.id !== NET.chainId) {
   throw new Error(
-    `venue misconfigured: NETWORK "${NETWORK}" is chain ${NET.chainId}, but the imported viem chain is ${somniaTestnet.id}`,
+    `venue misconfigured: NETWORK "${NETWORK}" is chain ${NET.chainId}, but the imported viem chain is ${CHAIN.id}`,
   )
 }
 // The venue's own Connect key. Empty when the venue has not been issued one (it still works —
@@ -71,13 +82,15 @@ const THEME = {
 // MUST match the brand, or a dark brand renders gray-on-white under a light OS.
 const COLOR_SCHEME = "light" as const
 
-// THE CHAIN MUST MATCH THE NETWORK ABOVE. This was hardcoded to viem's `somnia` (5031, mainnet)
-// while API/GATEWAY switched on the venue's network — so a testnet venue read its markets from
-// testnet and every chain-level operation from MAINNET. It fails the way that costs an evening: the
+// THE CHAIN COMES FROM `CHAIN` ABOVE — never a bare viem import here again. This site was once
+// hardcoded to viem's `somnia` (5031, mainnet) while API/GATEWAY switched on the venue's network —
+// so a testnet venue read its markets from testnet and every chain-level operation from MAINNET,
+// which is also exactly what a half-finished mainnet port looks like from the other direction, and
+// why the chain is derived rather than typed at each site. It fails the way that costs an evening: the
 // board fills, the venue looks right, and the checkout silently never opens, because the default
 // trade adapter resolved to the wrong chain's contracts. Reported from a real venue before this was
 // found. A reader that THROWS also locks the checkout path, so this must be a real client.
-const reader: ChainReader = createPublicClient({ chain: somniaTestnet, transport: http() })
+const reader: ChainReader = createPublicClient({ chain: CHAIN, transport: http() })
 
 /** Privy smart wallet -> Connect `Wallet`. The only wallet-specific glue a venue writes. */
 function WithPrivy({ children }: { children: ReactNode }) {
@@ -100,7 +113,7 @@ function WithPrivy({ children }: { children: ReactNode }) {
       executor: client
         ? {
             send: async (calls) => {
-              const req: any = calls.length === 1 ? { chain: somniaTestnet, to: calls[0]!.to, data: calls[0]!.data } : { calls }
+              const req: any = calls.length === 1 ? { chain: CHAIN, to: calls[0]!.to, data: calls[0]!.data } : { calls }
               return { txHash: (await client.sendTransaction(req)) as string }
             },
           }
@@ -167,8 +180,8 @@ export function Providers({ children }: { children: ReactNode }) {
         appearance: { theme: COLOR_SCHEME },
         // Headless signing — the {c} drawer stays the only confirm surface.
         embeddedWallets: { showWalletUIs: false, ethereum: { createOnLogin: 'users-without-wallets' } },
-        defaultChain: somniaTestnet,
-        supportedChains: [somniaTestnet],
+        defaultChain: CHAIN,
+        supportedChains: [CHAIN],
       }}
     >
       <SmartWalletsProvider>

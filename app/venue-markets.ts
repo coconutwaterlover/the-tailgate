@@ -8,16 +8,30 @@ import { useSearch } from '@prophecy-dev/connect-react'
 // too coarse: an F1 venue scoped to "sport" shows cricket and MLS. `useSearch` is the only surface
 // with a TEXT filter, and it returns full Event objects, so this feeds the same MarketGrid and keeps
 // grouping, columns and the rest.
-const VENUE_QUERY = "NFL"
+// NOT "NFL", and this is a MAINNET fact rather than a style preference. `mode: 'hybrid'` matches
+// fuzzily, and on mainnet "NFL" hits **NFLX** — the Netflix share price — hard enough to take 7 of
+// the 12 slots below (measured 2026-08-24: seven `NFLX close price…` markets, five actual football
+// ones). A tailgate whose board is majority stock-close markets reads as broken, and nothing in the
+// venue or in `validate` says a word about it, because 12 tradeable markets did come back.
+//
+// "NFL season" reaches the same football set without the ticker: 18 tradeable markets on mainnet,
+// every one of them `category: sport`.
+const VENUE_QUERY = "NFL season"
 // THE TERMS THE VENUE WIDENS WITH, and they are not a nicety — they are the difference between a board
-// and an empty state. The main NFL search currently reaches 21 tradeable testnet markets; the team
-// terms widen the first 12-result page with calls whose short titles emphasize a player or city.
+// and an empty state. On mainnet the query above reaches 18 tradeable markets and the page below shows
+// 12, so the terms are what fetch the rest; merged, this config lands 17 open football markets.
+//
+// The first term used to REPEAT `VENUE_QUERY`, which spent one of three widening slots on a query
+// whose results were already in the map (measured: `new=0`). And team names are far thinner on mainnet
+// than they look — "Kansas City Chiefs" returns 1 market, "Pittsburgh Steelers" 1 — so the widening
+// now leads with phrasings that cut ACROSS teams ("Week 1 2026 NFL", "starting quarterback") and keeps
+// a single city term for the short player-and-city titles the board likes.
 // The venue asks its subject AND its entities, then merges. Fixed count because these are hooks.
 // NOT `as const` — that made an empty list the TUPLE type `readonly []`, and `VENUE_TERMS[0]` on a
 // zero-length tuple is a type ERROR rather than `undefined`. Three of them, in the default case: a
 // venue scaffolded without `--terms` (SOC-560 #4b). The `?? VENUE_QUERY` below was written for
 // exactly the absence the type then denied could happen.
-const VENUE_TERMS: readonly string[] = ["NFL", "Kansas City Chiefs", "Pittsburgh Steelers"]
+const VENUE_TERMS: readonly string[] = ["Week 1 2026 NFL", "starting quarterback", "Steelers"]
 // `tradeable: true` FILTERS AT THE API, which is what makes the limit below worth having: the server
 // returns `limit` TRADEABLE markets rather than `limit` of anything, so settled ones no longer eat
 // the board. (Measured before this: "book" matched 12 at limit 12, ten of them settled — a board of
