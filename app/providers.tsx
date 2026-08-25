@@ -61,7 +61,24 @@ if (CHAIN.id !== NET.chainId) {
 // stays quiet. A generated venue that has not been issued a key is the second case — there is no
 // env var its operator forgot to set — so `undefined` would put a warning in the console of every
 // such venue with nothing anyone could do about it.
-const API_KEY = "pck_f952278e61adc38951e3a423a8636f345fee7b605aef0162e847a44805cf3b1a"
+//
+// EMPTY ON PURPOSE, AND THIS VENUE *DOES* HAVE A KEY. The mainnet key for `the-tailgate` is
+// deliberately not in git — this repo is PUBLIC, and while the key is not a secret in the usual
+// sense (it ships in the browser bundle, so every visitor already has it), a public history makes
+// it greppable at scale by people who never opened the venue. What it buys an abuser is budget
+// rather than funds: trades attributed to us, gas sponsored from our grant, and our market-creation
+// quota spent.
+//
+// SO A CLONE OF THIS REPO DEPLOYS KEYLESS, WHICH LOOKS FINE AND IS NOT. Reads still work, the board
+// still fills, and the venue silently loses sponsorship (visitors pay their own gas) and fee
+// attribution. Nothing on the page says so. Paste the key here before `prophecy deploy` — see
+// "Deploying" in the README — and do not commit it.
+//
+// Not read from `process.env` on purpose either: this is a client component, and the env-inlining
+// rules differ between `next build` and vinext's Vite pipeline. A bare `process.env` reference that
+// survives to the browser is a "process is not defined" crash, which trades a quiet degradation for
+// a blank venue.
+const API_KEY = ""
 
 // The brand, emitted from the venue spec. ONE ProphecyTheme re-skins the entire kit.
 const THEME = {

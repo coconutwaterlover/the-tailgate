@@ -79,12 +79,14 @@ This venue is a view over Prophecy’s market pool, not the pool itself. The sea
 [`app/venue-markets.ts`](app/venue-markets.ts):
 
 ```ts
-const VENUE_QUERY = "NFL"
-const VENUE_TERMS = ["NFL", "Kansas City Chiefs", "Pittsburgh Steelers"]
+const VENUE_QUERY = "NFL season"
+const VENUE_TERMS = ["Week 1 2026 NFL", "starting quarterback", "Steelers"]
 ```
 
-Search matches **market titles**. Team and player names usually hit; broad topics like `American
-sports` usually do not. After you change the query or terms:
+Search matches **market titles**, fuzzily — which is why the query is not `"NFL"`. On mainnet that
+matches **NFLX**, the Netflix share price, and takes most of the board with stock-close markets. Team
+and player names hit, but thinly (one market each for the Chiefs and the Steelers), so the widening
+terms are phrasings that cut across teams. This scope lands 17 open football markets. After you change the query or terms:
 
 1. Run `npm run validate`
 2. Stop if the scope report says `ON THE BOARD: 0`
@@ -131,13 +133,35 @@ framework preset should run `npm run build:vercel`.
 
 ### Prophecy hosting
 
+**The venue key is not in this repo.** `API_KEY` in [`app/providers.tsx`](app/providers.tsx) is
+deliberately empty: this repo is public, and a key committed here is greppable by people who never
+opened the venue. It is not a secret in the usual sense — it ships in the browser bundle, so every
+visitor holds it — but what it buys an abuser is our sponsorship budget, our fee attribution and our
+market-creation quota.
+
+So deploying is two steps, in this order:
+
 ```bash
-prophecy login
+# 1. paste the mainnet key into API_KEY in app/providers.tsx — do not commit it
 prophecy deploy --key pck_… --venue the-tailgate
 ```
 
-The venue id is `the-tailgate`. A new clone still needs its own key from
-`prophecy venue create "The Tailgate"` — that command prints the `pck_…` key once.
+The key in `--key` authenticates the deploy; the one in `API_KEY` is what the built venue carries at
+runtime. Both are the same key, and **skipping the paste does not fail the deploy** — the venue goes
+live keyless, reads fine, fills its board, and quietly makes every visitor pay their own gas with no
+fees attributed to us. Nothing on the page says so, so check the bundle if unsure:
+
+```bash
+curl -s https://the-tailgate.venues.prophecyhosting.com/ \
+  | grep -oE '/_next/static/chunks/providers-[^"]+\.js' \
+  | head -1 | xargs -I{} curl -s https://the-tailgate.venues.prophecyhosting.com{} \
+  | grep -c pck_
+```
+
+`1` means the key shipped; `0` means the venue is live and keyless.
+
+The venue id is `the-tailgate`, already claimed on mainnet. A *different* venue needs its own key
+from `prophecy venue create "<Name>"` — that command prints the `pck_…` key once.
 
 The launch walkthrough is at
 [docs.prophecyhosting.com/launch-a-venue.txt](https://docs.prophecyhosting.com/launch-a-venue.txt).
