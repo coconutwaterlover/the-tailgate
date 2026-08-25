@@ -69,15 +69,31 @@ if (CHAIN.id !== NET.chainId) {
 // rather than funds: trades attributed to us, gas sponsored from our grant, and our market-creation
 // quota spent.
 //
-// SO A CLONE OF THIS REPO DEPLOYS KEYLESS, WHICH LOOKS FINE AND IS NOT. Reads still work, the board
-// still fills, and the venue silently loses sponsorship (visitors pay their own gas) and fee
-// attribution. Nothing on the page says so. Paste the key here before `prophecy deploy` — see
-// "Deploying" in the README — and do not commit it.
+// THE LINE AT THE BOTTOM OF THIS COMMENT IS A SLOT, AND `prophecy deploy` FILLS IT. The CLI reads
+// this file, finds the assignment by regex, and writes the key from `--key` (or `PROPHECY_VENUE_KEY`)
+// into it before building — `injectVenueKey` in @prophecy-dev/prophecy-cli 0.1.0. So the empty string
+// is not a missing step: it is the frame the key lands in, and the deployed venue carries the key
+// even though git never does.
 //
-// Not read from `process.env` on purpose either: this is a client component, and the env-inlining
-// rules differ between `next build` and vinext's Vite pipeline. A bare `process.env` reference that
-// survives to the browser is a "process is not defined" crash, which trades a quiet degradation for
-// a blank venue.
+// KEEP THE ASSIGNMENT IN ITS EXACT SHAPE — `const`, the name, ` = `, a quoted string. No template
+// literal, no `??`, no reading it from elsewhere: a line the regex cannot match refuses the deploy
+// with "so the venue key has nowhere to go".
+//
+// AND DO NOT SPELL THAT ASSIGNMENT OUT IN PROSE ANYWHERE ABOVE IT. The CLI takes the FIRST match in
+// the file, so a comment quoting the pattern steals the injection: the key lands in a comment, the
+// real constant stays empty, and the deploy reports success while putting a keyless venue live. This
+// comment did exactly that for one draft, which is why it now describes the pattern instead of
+// quoting it — the same failure as the guard that cannot tell a mounted provider from a mentioned
+// one, one file over.
+//
+// Deploying with no key at all is LOUD, not silent — the CLI prints "WARNING: no venue key — this
+// venue will trade unattributed and unsponsored" and carries on. If you see that line, the venue is
+// about to go live keyless: reads fine, board fills, every visitor pays their own gas.
+//
+// Not read from `process.env` either, and now for a second reason on top of the first: this is a
+// client component, and env inlining differs between `next build` and vinext's Vite pipeline, where a
+// surviving `process.env` reference is a blank venue rather than a degraded one — and the CLI's
+// injection makes the whole question moot.
 const API_KEY = ""
 
 // The brand, emitted from the venue spec. ONE ProphecyTheme re-skins the entire kit.

@@ -76,11 +76,15 @@ Every pick should feel like slapping 25 PST on a cooler lid, not filling in a fo
   },
 ] as const
 
+// The flags here are the CLI's real ones (prophecy-cli 0.1.0): `deploy` takes --key, --name,
+// --dry-run and --skip-install, and `venue create` takes --network. There is no --venue on deploy —
+// the worker name comes from the directory, which is what makes the hostname. This copy showed a
+// --venue flag for a while; a visitor who pasted it got "Unknown option".
 const GO_LIVE_COMMANDS = `prophecy login
 
-prophecy venue create "The Tailgate"
+prophecy venue create "The Tailgate" --network mainnet
 
-prophecy deploy --key pck_… --venue the-tailgate`
+prophecy deploy --key pck_…`
 
 const GO_LIVE_CARD = {
   title: 'Put it on the lot',
@@ -228,8 +232,14 @@ function CopyVenueSection() {
 }
 
 // PositionsTable REQUIRES `wallet`; the current one lives on the Prophecy session. Same client-only
-// guard as WalletButton below and for the same reason — ProphecyProvider mounts after hydration
-// (see Providers), so calling useProphecy on the server render throws for want of its provider.
+// guard as WalletButton below and for the same reason — the Prophecy provider mounts after hydration
+// (see app/providers.tsx), so calling useProphecy on the server render throws for want of it.
+//
+// The provider is named in prose rather than spelled as its identifier ON PURPOSE: `prophecy
+// validate` greps page files for the provider names and fails the deploy on a match, because a page
+// that REMOUNTS a provider is a real and serious bug. It cannot tell a mount from a mention, and
+// this venue spent a deploy finding that out. The page mounts nothing; keep it that way, and keep
+// talking about it in words.
 function MyPositions() {
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])

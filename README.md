@@ -66,9 +66,16 @@ npm run build
 npm run shot
 ```
 
-`validate` is the same check that gates a Prophecy deploy. It also prints a **scope check** — how
-many tradeable markets this venue actually matches. `ON THE BOARD: 0` means a visitor sees an empty
-lot.
+`validate` is the same guard that gates a Prophecy deploy — it reads the venue's source and refuses
+things like a page that remounts a provider. On CLI 0.1.0 that is *all* it does: it prints
+`Venue guard passed (N files checked)` and **no scope check**. Earlier docs promised an
+`ON THE BOARD: N` line; don't wait for it. The guard never fetches a market, so it cannot tell you
+whether a visitor sees a board — for that, query the API for the terms in `app/venue-markets.ts`, or
+run the venue and look.
+
+The guard matches on **text**, not on what the code does: naming `ProphecyProvider` or
+`ConnectProvider` anywhere in a page file fails the deploy, comments included. Talk about the
+providers in prose in page files.
 
 `shot` writes `shots/desktop.png` and `shots/mobile.png`. It needs Playwright and Chromium available
 to the Prophecy CLI. Look at the PNGs; no other check looks at the page.
@@ -133,23 +140,36 @@ framework preset should run `npm run build:vercel`.
 
 ### Prophecy hosting
 
-**The venue key is not in this repo.** `API_KEY` in [`app/providers.tsx`](app/providers.tsx) is
-deliberately empty: this repo is public, and a key committed here is greppable by people who never
-opened the venue. It is not a secret in the usual sense — it ships in the browser bundle, so every
-visitor holds it — but what it buys an abuser is our sponsorship budget, our fee attribution and our
-market-creation quota.
+**The venue key is not in this repo, and does not need to be.** `API_KEY` in
+[`app/providers.tsx`](app/providers.tsx) is an empty **slot**: `prophecy deploy` matches that line and
+writes the key from `--key` (or `PROPHECY_VENUE_KEY`) into it before building. The deployed venue
+carries the key; git never does. Keep the line in its exact shape — the CLI's regex is
+`const API_KEY = (["'])(.*?)\1`, and a line it cannot match refuses the deploy.
 
-So deploying is two steps, in this order:
+Keeping it out of git is deliberate. It is not a secret in the usual sense — it ships in the browser
+bundle, so every visitor holds it — but committing it to a public repo makes it greppable by people
+who never opened the venue, and what it buys an abuser is our sponsorship budget, our fee attribution
+and our market-creation quota.
 
 ```bash
-# 1. paste the mainnet key into API_KEY in app/providers.tsx — do not commit it
-prophecy deploy --key pck_… --venue the-tailgate
+export PROPHECY_ACCESS_TOKEN=…                  # or: prophecy login
+prophecy deploy --key pck_…                     # worker name comes from the directory
 ```
 
-The key in `--key` authenticates the deploy; the one in `API_KEY` is what the built venue carries at
-runtime. Both are the same key, and **skipping the paste does not fail the deploy** — the venue goes
-live keyless, reads fine, fills its board, and quietly makes every visitor pay their own gas with no
-fees attributed to us. Nothing on the page says so, so check the bundle if unsure:
+Deploying with no key does not fail — it prints `WARNING: no venue key — this venue will trade
+unattributed and unsponsored` and goes live keyless: reads fine, board fills, every visitor pays
+their own gas. Watch for that line.
+
+Two things the deploy needs that are easy to miss:
+
+- **Cloudflare auth.** The publish step shells out to `wrangler … --dispatch-namespace
+  prophecy-studio`, so it needs `wrangler login` or `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID`
+  in the environment. Without it the build succeeds and the publish fails.
+- **The key lands on disk.** After a real deploy, `app/providers.tsx` holds the key locally. Run
+  `git checkout app/providers.tsx` before committing anything.
+
+`prophecy deploy --dry-run --skip-install` runs the guard and the full build and publishes nothing —
+worth doing first. To confirm afterwards which way a live deploy went:
 
 ```bash
 curl -s https://the-tailgate.venues.prophecyhosting.com/ \
