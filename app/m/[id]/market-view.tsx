@@ -3,10 +3,11 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { VenueShell, MarketDetail, ActivityFeed, ResolutionReceipt, EmptyState, ErrorState, Skeleton, fmtWei, short, useMarketDetailData } from '@prophecy-dev/venue-kit'
-import { Comments, useConnect } from '@prophecy-dev/connect-react'
+import { useConnect } from '@prophecy-dev/connect-react'
 import { TailgateHeader } from '../../components/tailgate-header'
 import { TailgateOtherLots } from '../../components/tailgate-other-lots'
 import { WalletButton } from '../../components/tailgate-session'
+import { TailgateComments } from '../../components/tailgate-comments'
 
 function TailgateEmpty({ title, message }: { title: string; message: string }) {
   return (
@@ -64,9 +65,8 @@ export function MarketView({ id }: { id: string }) {
               decimals={asked.collateral?.decimals ?? 18}
             />
             <h2 className="venue-section">What the crowd is saying</h2>
-            <Comments
-              subjectType="event"
-              subjectRef={id}
+            <TailgateComments
+              marketId={id}
               emptyState={<TailgateEmpty title="The folding chairs are quiet" message="Bring the first take to the circle." />}
             />
             {/* WHY a market resolved the way it did, with its sources. Works with no configuration at

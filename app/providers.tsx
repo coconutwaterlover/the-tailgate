@@ -6,7 +6,8 @@ import { SmartWalletsProvider, useSmartWallets } from '@privy-io/react-auth/smar
 import { createPublicClient, http } from 'viem'
 import { somnia } from 'viem/chains'
 import { ConnectProvider, ProphecyCheckout, ProphecyConfirm, ProphecyProvider, type Wallet } from '@prophecy-dev/connect-react'
-import { NETWORKS, pst, type ChainReader } from '@prophecy-dev/connect-sdk'
+import { TailgateCallNotice } from './components/tailgate-call-notice'
+import { NETWORKS, pst, ConnectAuth, type ChainReader } from '@prophecy-dev/connect-sdk'
 
 // ONE NAME FOR THE NETWORK, and everything else derived from it.
 //
@@ -52,6 +53,15 @@ if (somnia.id !== NET.chainId) {
 // such venue with nothing anyone could do about it.
 const API_KEY = "pck_44b6de269d4b09e14736ce79a6c64756e523c15734fc91e9f277c88cbf8b74c0"
 
+// ONE session for checkout AND comments. ConnectProvider builds the client comments write through;
+// ProphecyProvider used to mint a private ConnectAuth those writes never saw, so a signed-in visitor
+// could predict and still get 401 "Sign in to post" on the same page.
+const AUTH = new ConnectAuth({
+  network: NETWORK,
+  gatewayUrl: GATEWAY,
+  apiKey: API_KEY || null,
+})
+
 // The brand, emitted from the venue spec. ONE ProphecyTheme re-skins the entire kit.
 const THEME = {
   "accent": "#c94d34",
@@ -81,7 +91,7 @@ const reader: ChainReader = createPublicClient({ chain: somnia, transport: http(
 
 /** Privy smart wallet -> Connect `Wallet`. The only wallet-specific glue a venue writes. */
 function WithPrivy({ children }: { children: ReactNode }) {
-  const { user, getAccessToken } = usePrivy()
+  const { user, getAccessToken, login } = usePrivy()
   const { identityToken } = useIdentityToken()
   const { wallets } = useWallets()
   const { client, getClientForChain } = useSmartWallets()
@@ -141,21 +151,30 @@ function WithPrivy({ children }: { children: ReactNode }) {
       // together, and the venue looks completely healthy while any single one is wrong.
       apiUrl={API}
       apiKey={API_KEY || null}
-      // Steers the DEFAULT trade adapter at the right chain's contracts. Without it the adapter
-      // resolves to mainnet whatever the reader says, and the checkout never opens on testnet —
-      // the venue looks entirely healthy right up until someone tries to trade.
       network={NETWORK}
       wallet={wallet}
       reader={reader}
+      auth={AUTH}
+      onRequireSignIn={() => login()}
       theme={THEME}
       colorScheme={COLOR_SCHEME}
       stake={pst(25)}
+      // Venue-owned receipts. The default toast says "Buy No submitted" plus a hash, which reads
+      // as a failure. Opt out and render TailgateCallNotice from the same checkout events.
+      outcomes={false}
+      strings={{
+        outcomes: {
+          submitted: 'is on the record',
+          failed: 'The call did not land',
+        },
+      }}
     >
       {children}
       {/* The {c} drawer — mount once, or predict silently no-ops. */}
       <ProphecyCheckout />
       {/* Winnings claims use this confirm, not the trade drawer. Without it, ClaimSheet hides its button. */}
       <ProphecyConfirm />
+      <TailgateCallNotice />
     </ProphecyProvider>
   )
 }
@@ -175,7 +194,7 @@ function ClientOnly({ children, fallback }: { children: ReactNode; fallback: Rea
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ConnectProvider network={NETWORK} baseUrl={API} apiKey={API_KEY || null} timeoutMs={4000}>
+    <ConnectProvider network={NETWORK} baseUrl={API} apiKey={API_KEY || null} timeoutMs={4000} auth={AUTH}>
     <ClientOnly fallback={children}>
     <PrivyProvider
       appId={PRIVY_APP_ID}

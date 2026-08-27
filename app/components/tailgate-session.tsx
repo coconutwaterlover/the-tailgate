@@ -6,6 +6,7 @@ import { useSmartWallets } from '@privy-io/react-auth/smart-wallets'
 import { somnia } from 'viem/chains'
 import { useProphecy, useWallet, UserBadge, WalletBalance } from '@prophecy-dev/connect-react'
 import { pct, short } from '@prophecy-dev/venue-kit'
+import { useLastCall } from './tailgate-call-notice'
 
 const VENUE_CHAIN_ID = somnia.id
 
@@ -60,8 +61,10 @@ function WalletChair() {
   const { owner, isReady, session } = useProphecy()
   const { client } = useSmartWallets()
   const { profile } = useWallet(owner)
+  const lastCall = useLastCall()
   const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [copiedTx, setCopiedTx] = useState(false)
   const panelId = useId()
   const rootRef = useRef<HTMLDivElement>(null)
 
@@ -177,6 +180,31 @@ function WalletChair() {
                 {session?.method ? ` · ${session.method}` : ''}
               </dd>
             </div>
+            {lastCall ? (
+              <div>
+                <dt>Last receipt</dt>
+                <dd className="tailgate-wallet-panel__receipt">
+                  <span>{lastCall.headline}</span>
+                  <code>{lastCall.hash}</code>
+                  <div className="tailgate-wallet-panel__receipt-actions">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        void navigator.clipboard.writeText(lastCall.hash).then(() => {
+                          setCopiedTx(true)
+                          window.setTimeout(() => setCopiedTx(false), 1600)
+                        })
+                      }}
+                    >
+                      {copiedTx ? 'Copied' : 'Copy hash'}
+                    </button>
+                    <a href={`${venueChain.explorer}/tx/${lastCall.hash}`} target="_blank" rel="noreferrer">
+                      Open explorer
+                    </a>
+                  </div>
+                </dd>
+              </div>
+            ) : null}
             {profile ? (
               <>
                 <div>
