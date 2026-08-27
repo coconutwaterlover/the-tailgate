@@ -78,6 +78,7 @@ body {
 [data-archetype='tailgate'] .vk-shell__bar {
   min-height: 68px;
   flex-wrap: wrap;
+  overflow: visible;
 }
 
 .tailgate-header__identity {
@@ -142,6 +143,7 @@ body {
 }
 
 .tailgate-header__session {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -153,6 +155,130 @@ body {
   font: inherit;
   font-size: 12px;
   font-weight: 800;
+}
+
+.tailgate-chain-pill {
+  color: var(--pc-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px dashed var(--pc-border);
+  border-radius: var(--pc-radius);
+  padding: 3px 8px;
+  background: var(--pc-inner);
+}
+
+.tailgate-chain-pill--warn,
+.tailgate-wallet-panel__warn {
+  color: var(--pc-danger);
+}
+
+.tailgate-wallet-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 40;
+  width: min(22.5rem, calc(100vw - 24px));
+  padding: calc(var(--pc-space) * 4);
+  display: grid;
+  gap: calc(var(--pc-space) * 3);
+  background: var(--pc-inner);
+  color: var(--pc-text);
+  border: 2px solid var(--pc-border);
+  border-radius: var(--pc-radius);
+  box-shadow: 0 6px 0 var(--pc-border);
+}
+
+.tailgate-wallet-panel__head {
+  display: grid;
+  gap: 4px;
+}
+
+.tailgate-wallet-panel__head span {
+  color: var(--pc-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tailgate-wallet-panel__head strong {
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.tailgate-wallet-panel__badge {
+  justify-self: start;
+}
+
+.tailgate-wallet-panel__rows {
+  display: grid;
+  gap: calc(var(--pc-space) * 2);
+  margin: 0;
+}
+
+.tailgate-wallet-panel__rows > div {
+  display: grid;
+  gap: 2px;
+  padding-bottom: calc(var(--pc-space) * 2);
+  border-bottom: 1px dashed var(--pc-border);
+}
+
+.tailgate-wallet-panel__rows dt {
+  color: var(--pc-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tailgate-wallet-panel__rows dd {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  word-break: break-all;
+}
+
+.tailgate-wallet-panel__rows code {
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.tailgate-wallet-panel__rows button,
+.tailgate-wallet-panel__actions button,
+.tailgate-wallet-panel__actions a {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 10px;
+  color: var(--pc-text);
+  background: var(--pc-surface);
+  border: 1px solid var(--pc-border);
+  border-radius: var(--pc-radius);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tailgate-wallet-panel p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.tailgate-wallet-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
 }
 
 .tailgate-header__wallet .pc-wal__claim {
@@ -1424,6 +1550,11 @@ body {
     width: 100%;
     margin-left: 0;
     justify-content: flex-end;
+  }
+
+  .tailgate-wallet-panel {
+    right: 0;
+    left: auto;
   }
 
   .tailgate-header__tower {

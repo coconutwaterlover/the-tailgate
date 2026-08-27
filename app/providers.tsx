@@ -4,7 +4,7 @@ import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import { PrivyProvider, useIdentityToken, usePrivy, useWallets } from '@privy-io/react-auth'
 import { SmartWalletsProvider, useSmartWallets } from '@privy-io/react-auth/smart-wallets'
 import { createPublicClient, http } from 'viem'
-import { somniaTestnet } from 'viem/chains'
+import { somnia } from 'viem/chains'
 import { ConnectProvider, ProphecyCheckout, ProphecyConfirm, ProphecyProvider, type Wallet } from '@prophecy-dev/connect-react'
 import { NETWORKS, pst, type ChainReader } from '@prophecy-dev/connect-sdk'
 
@@ -19,7 +19,7 @@ import { NETWORKS, pst, type ChainReader } from '@prophecy-dev/connect-sdk'
 // for exactly this: "a venue carries five things that must agree, and holding four of them in four
 // places is what produced four separate renders-fine-talks-to-the-wrong-server incidents". Switching
 // this venue between networks is now ONE word.
-const NETWORK = "testnet" as const
+const NETWORK = "mainnet" as const
 const NET = NETWORKS[NETWORK]
 const API = NET.apiUrl
 const GATEWAY = NET.gatewayUrl
@@ -37,9 +37,9 @@ const PRIVY_APP_ID = "cmo2sszq800qd0bl7mqtdv4zp"
 // THE CHAIN IS THE ONE THING STILL WRITTEN TWICE, because viem wants an object and `NET` carries an
 // id. So it is asserted rather than trusted: a chain that does not match the network fails at import
 // with a message naming both, instead of a venue that reads one chain and signs on another.
-if (somniaTestnet.id !== NET.chainId) {
+if (somnia.id !== NET.chainId) {
   throw new Error(
-    `venue misconfigured: NETWORK "${NETWORK}" is chain ${NET.chainId}, but the imported viem chain is ${somniaTestnet.id}`,
+    `venue misconfigured: NETWORK "${NETWORK}" is chain ${NET.chainId}, but the imported viem chain is ${somnia.id}`,
   )
 }
 // The venue's own Connect key. Empty when the venue has not been issued one (it still works —
@@ -50,7 +50,7 @@ if (somniaTestnet.id !== NET.chainId) {
 // stays quiet. A generated venue that has not been issued a key is the second case — there is no
 // env var its operator forgot to set — so `undefined` would put a warning in the console of every
 // such venue with nothing anyone could do about it.
-const API_KEY = "pck_f952278e61adc38951e3a423a8636f345fee7b605aef0162e847a44805cf3b1a"
+const API_KEY = "pck_44b6de269d4b09e14736ce79a6c64756e523c15734fc91e9f277c88cbf8b74c0"
 
 // The brand, emitted from the venue spec. ONE ProphecyTheme re-skins the entire kit.
 const THEME = {
@@ -77,14 +77,24 @@ const COLOR_SCHEME = "light" as const
 // board fills, the venue looks right, and the checkout silently never opens, because the default
 // trade adapter resolved to the wrong chain's contracts. Reported from a real venue before this was
 // found. A reader that THROWS also locks the checkout path, so this must be a real client.
-const reader: ChainReader = createPublicClient({ chain: somniaTestnet, transport: http() })
+const reader: ChainReader = createPublicClient({ chain: somnia, transport: http() })
 
 /** Privy smart wallet -> Connect `Wallet`. The only wallet-specific glue a venue writes. */
 function WithPrivy({ children }: { children: ReactNode }) {
   const { user, getAccessToken } = usePrivy()
   const { identityToken } = useIdentityToken()
   const { wallets } = useWallets()
-  const { client } = useSmartWallets()
+  const { client, getClientForChain } = useSmartWallets()
+
+  // ONE Privy app serves both Somnia chains. The DEFAULT client is whichever chain the wallet last
+  // used — for anyone who signed in on the testnet Tailgate, that is Shannon (50312). Checkout then
+  // looks ready, PST is on the wrong chain, and the first predict never lands on mainnet.
+  useEffect(() => {
+    if (!client) return
+    void client.switchChain({ id: NET.chainId }).catch(() => {
+      void getClientForChain({ id: NET.chainId })
+    })
+  }, [client, getClientForChain])
 
   const address =
     (user?.linkedAccounts?.find((a) => (a as { type?: string }).type === 'smart_wallet') as { address?: string } | undefined)
@@ -100,13 +110,19 @@ function WithPrivy({ children }: { children: ReactNode }) {
       executor: client
         ? {
             send: async (calls) => {
-              const req: any = calls.length === 1 ? { chain: somniaTestnet, to: calls[0]!.to, data: calls[0]!.data } : { calls }
-              return { txHash: (await client.sendTransaction(req)) as string }
+              // Resolve the MAINNET client first. Passing `chain` on a batched user-op is invalid
+              // Privy input and is what made predict error after the first mainnet cutover.
+              const sw = (await getClientForChain({ id: NET.chainId })) ?? client
+              const req: any =
+                calls.length === 1
+                  ? { chain: somnia, to: calls[0]!.to, data: calls[0]!.data }
+                  : { calls }
+              return { txHash: (await sw.sendTransaction(req)) as string }
             },
           }
         : null,
     }),
-    [address, client, getAccessToken, identityToken],
+    [address, client, getClientForChain, getAccessToken, identityToken],
   )
 
   return (
@@ -159,7 +175,7 @@ function ClientOnly({ children, fallback }: { children: ReactNode; fallback: Rea
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ConnectProvider baseUrl={API} apiKey={API_KEY || null} timeoutMs={4000}>
+    <ConnectProvider network={NETWORK} baseUrl={API} apiKey={API_KEY || null} timeoutMs={4000}>
     <ClientOnly fallback={children}>
     <PrivyProvider
       appId={PRIVY_APP_ID}
@@ -167,8 +183,8 @@ export function Providers({ children }: { children: ReactNode }) {
         appearance: { theme: COLOR_SCHEME },
         // Headless signing — the {c} drawer stays the only confirm surface.
         embeddedWallets: { showWalletUIs: false, ethereum: { createOnLogin: 'users-without-wallets' } },
-        defaultChain: somniaTestnet,
-        supportedChains: [somniaTestnet],
+        defaultChain: somnia,
+        supportedChains: [somnia],
       }}
     >
       <SmartWalletsProvider>

@@ -49,7 +49,7 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000). The Privy app used for sign-in must allow that
 exact origin, including the port.
 
-The venue runs on Somnia testnet. After you sign in, starter PST can auto-claim and a daily drip is
+The venue runs on Somnia mainnet. After you sign in, starter PST can auto-claim and a daily drip is
 available to claim by hand.
 
 ## Verify
@@ -74,8 +74,8 @@ This venue is a view over Prophecy’s market pool, not the pool itself. The sea
 [`app/venue-markets.ts`](app/venue-markets.ts):
 
 ```ts
-const VENUE_QUERY = "NFL"
-const VENUE_TERMS = ["NFL", "Kansas City Chiefs", "Pittsburgh Steelers"]
+const VENUE_QUERY = "starting QB"
+const VENUE_TERMS = ["Steelers", "Chiefs", "Browns"]
 ```
 
 Search matches **market titles**. Team and player names usually hit; broad topics like `American
@@ -128,11 +128,12 @@ framework preset should run `npm run build:vercel`.
 
 ```bash
 prophecy login
+prophecy venue create "The Tailgate" --network mainnet
 prophecy deploy --key pck_… --venue the-tailgate
 ```
 
-The venue id is `the-tailgate`. A new clone still needs its own key from
-`prophecy venue create "The Tailgate"` — that command prints the `pck_…` key once.
+The venue id is `the-tailgate`. A new clone still needs its own mainnet key from
+`prophecy venue create "The Tailgate" --network mainnet` — that command prints the `pck_…` key once.
 
 The launch walkthrough is at
 [docs.prophecyhosting.com/launch-a-venue.txt](https://docs.prophecyhosting.com/launch-a-venue.txt).

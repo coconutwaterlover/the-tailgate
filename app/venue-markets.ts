@@ -8,16 +8,11 @@ import { useSearch } from '@prophecy-dev/connect-react'
 // too coarse: an F1 venue scoped to "sport" shows cricket and MLS. `useSearch` is the only surface
 // with a TEXT filter, and it returns full Event objects, so this feeds the same MarketGrid and keeps
 // grouping, columns and the rest.
-const VENUE_QUERY = "NFL"
-// THE TERMS THE VENUE WIDENS WITH, and they are not a nicety — they are the difference between a board
-// and an empty state. The main NFL search currently reaches 21 tradeable testnet markets; the team
-// terms widen the first 12-result page with calls whose short titles emphasize a player or city.
-// The venue asks its subject AND its entities, then merges. Fixed count because these are hooks.
-// NOT `as const` — that made an empty list the TUPLE type `readonly []`, and `VENUE_TERMS[0]` on a
-// zero-length tuple is a type ERROR rather than `undefined`. Three of them, in the default case: a
-// venue scaffolded without `--terms` (SOC-560 #4b). The `?? VENUE_QUERY` below was written for
-// exactly the absence the type then denied could happen.
-const VENUE_TERMS: readonly string[] = ["NFL", "Kansas City Chiefs", "Pittsburgh Steelers"]
+const VENUE_QUERY = "starting QB"
+// THE TERMS THE VENUE WIDENS WITH. Search matches TITLES, so "NFL" is a prefix of "NFLX" and a
+// football lot fills with Netflix close-price markets. Names that appear on the football cards
+// (starting QB, team nicknames) do not. Do not use "Falcons" — that title-matches SpaceX Falcon.
+const VENUE_TERMS: readonly string[] = ["Steelers", "Chiefs", "Browns"]
 // `tradeable: true` FILTERS AT THE API, which is what makes the limit below worth having: the server
 // returns `limit` TRADEABLE markets rather than `limit` of anything, so settled ones no longer eat
 // the board. (Measured before this: "book" matched 12 at limit 12, ten of them settled — a board of
@@ -35,7 +30,7 @@ const VENUE_TERMS: readonly string[] = ["NFL", "Kansas City Chiefs", "Pittsburgh
 // the strength of the old shape; the venue is not typechecked, so it would have been dropped in
 // silence — the same class of failure as the `tradeable` drop it was written to survive. The category
 // nav filters the merged array in the page instead.
-const VENUE_SEARCH = {"mode":"hybrid","tradeable":true,"limit":12} as const
+const VENUE_SEARCH = {"mode":"hybrid","tradeable":true,"limit":24} as const
 
 // The venue's OWN markets, baked in so this venue leads with them even with NOTHING else reachable.
 // Safe to compile in because pins only REORDER the query's results below — a resolved market is not in
@@ -44,6 +39,14 @@ const LOCAL_PINS: string[] = []
 // Where those pins REFRESH from, so a venue that does talk to the studio stays current with no rebuild.
 // `null` means this venue was built to run without us and does not call home at all.
 const VENUE_MANIFEST = "https://studio.prophecyhosting.com/v/the-tailgate/markets.json"
+
+function isFootballCall(e: { title?: string | null; name?: string | null }) {
+  const text = `${e.title ?? ""} ${e.name ?? ""}`
+  // Belt: even if a query regresses to "NFL", Netflix tickers stay off the lot.
+  if (/NFLX/i.test(text)) return false
+  if (/\bclose price\b/i.test(text) || /\bclose below\b/i.test(text)) return false
+  return true
+}
 
 /**
  * The markets THIS venue is about. Use this instead of a bare <MarketGrid />, which fetches the GLOBAL
@@ -68,7 +71,7 @@ export function useVenueMarkets() {
     // visitor reads the board was tradeable when fetched and is not any more, and `isTradeable`
     // re-checks against the clock. It is also the floor if a venue is pinned to a connect-react old
     // enough to drop the option.
-    return [...byId.values()].filter((e) => isTradeable(e as never))
+    return [...byId.values()].filter((e) => isTradeable(e as never) && isFootballCall(e))
   }, [main.results, t1.results, t2.results, t3.results])
   // ANY query still in flight means the board is not finished. This was `&&`, which is true only
   // while ALL FOUR are loading — so the moment the fastest one returned, the venue declared itself

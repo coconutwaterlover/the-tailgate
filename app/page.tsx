@@ -78,7 +78,7 @@ Every pick should feel like slapping 25 PST on a cooler lid, not filling in a fo
 
 const GO_LIVE_COMMANDS = `prophecy login
 
-prophecy venue create "The Tailgate"
+prophecy venue create "The Tailgate" --network mainnet
 
 prophecy deploy --key pck_… --venue the-tailgate`
 
