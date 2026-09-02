@@ -100,9 +100,14 @@ const FULL_VENUE_PROMPT = [
 
 // GENERIC OVER THE EVENT, not narrowed to BoardEvent. `BoardEvent` is the structural subset this
 // file's helpers read (id, title, outcomes, tradeCount); narrowing to it here threw away the wire
-// `Event` that `useVenueMarkets()` actually hands over, and <MarketGrid events> wants the whole
-// thing — which is why `next build` rejected this on Vercel while `vinext build` (no typecheck)
-// passed. Threading T keeps both true: the helpers see what they need, the kit gets the real event.
+// `Event` that `useVenueMarkets()` actually hands over, and the kit's grid wants the whole thing on
+// its `events` prop — which is why `next build` rejected this on Vercel while `vinext build` (no
+// typecheck) passed. Threading T keeps both true: the helpers see what they need, the kit gets the
+// real event.
+//
+// Written without the angle-bracketed tag name on purpose: the venue guard reads page code as TEXT,
+// so a tag written out in prose here is indistinguishable from a real unscoped one and fails the
+// deploy. Same reason the note on MyPositions below does not spell out the provider's name.
 function useCallBoard<T extends BoardEvent>(events: readonly T[]) {
   const [preview, setPreview] = useState(false)
   useEffect(() => {
@@ -241,8 +246,9 @@ function CopyVenueSection() {
 }
 
 // PositionsTable REQUIRES `wallet`; the current one lives on the Prophecy session. Same client-only
-// guard as WalletButton below and for the same reason — ProphecyProvider mounts after hydration
-// (see Providers), so calling useProphecy on the server render throws for want of its provider.
+// guard as WalletButton below and for the same reason — the Prophecy provider mounts after
+// hydration (see app/providers.tsx), so calling useProphecy on the server render throws for want of
+// its provider.
 function MyPositions() {
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
