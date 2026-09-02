@@ -98,7 +98,12 @@ const FULL_VENUE_PROMPT = [
   `${GO_LIVE_CARD.title}\n\n${GO_LIVE_CARD.prompt}`,
 ].join('\n\n---\n\n')
 
-function useCallBoard(events: readonly BoardEvent[]) {
+// GENERIC OVER THE EVENT, not narrowed to BoardEvent. `BoardEvent` is the structural subset this
+// file's helpers read (id, title, outcomes, tradeCount); narrowing to it here threw away the wire
+// `Event` that `useVenueMarkets()` actually hands over, and <MarketGrid events> wants the whole
+// thing — which is why `next build` rejected this on Vercel while `vinext build` (no typecheck)
+// passed. Threading T keeps both true: the helpers see what they need, the kit gets the real event.
+function useCallBoard<T extends BoardEvent>(events: readonly T[]) {
   const [preview, setPreview] = useState(false)
   useEffect(() => {
     setPreview(shouldPreviewBoard())
