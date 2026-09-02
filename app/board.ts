@@ -132,3 +132,24 @@ function teamsIn(event: BoardEvent): string[] {
   }
   return found.sort((left, right) => left.at - right.at).map((team) => team.name)
 }
+
+/**
+ * THE POPULAR CALLS — the blocks that say "this is where everyone else is".
+ *
+ * Demo feedback (Sep 1): "instead of [the whole lot] … above it if you have popular calls. So where
+ * everyone else is going. So that if it has two or three content blocks which takes users to those
+ * particular ones where everyone else is placing their calls."
+ *
+ * `calls` arrives heat-sorted, and `calls[0]` is already on the cooler as today's big sign — so the
+ * popular stack is the next few, and a call with no picks on it is not popular, it is just a call.
+ * Taken by POSITION rather than by the queue's current index on purpose: flipping through the queue
+ * would otherwise reshuffle this section under the reader's thumb.
+ */
+export const POPULAR_COUNT = 3
+
+export function popularCalls<T extends BoardEvent>(calls: readonly T[]): T[] {
+  const picked = calls.slice(1, 1 + POPULAR_COUNT).filter((event) => (event.tradeCount ?? 0) > 0)
+  // One card is not a section — it stretches across the row and reads as a half-built shelf. On a
+  // board where only the big sign has picks on it, the whole lot below is the honest answer.
+  return picked.length >= 2 ? picked : []
+}

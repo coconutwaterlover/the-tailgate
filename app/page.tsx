@@ -23,12 +23,14 @@ import { LotHeadcount } from './components/lot-headcount'
 import { LotChatter } from './components/lot-chatter'
 import { LotGames } from './components/lot-games'
 import { LotQueue } from './components/lot-queue'
+import { LotPopular } from './components/lot-popular'
 import { crowdPresence, pickTotal, shouldPreviewSampleCrowd, type CrowdEvent } from './crowd'
 import {
   decorateBoard,
   filterByGame,
   gameChips,
   MORE_STACK,
+  popularCalls,
   shouldPreviewBoard,
   type BoardEvent,
 } from './board'
@@ -114,7 +116,12 @@ function useCallBoard(events: readonly BoardEvent[]) {
   }, [game, calls.length])
 
   const current = calls[index] ?? null
-  const more = calls.filter((event) => event.id !== current?.id)
+  // The popular blocks and the big sign are the two promoted surfaces; the whole lot below is
+  // everything else, so a call appears exactly once on the page and "see everything" still means
+  // everything.
+  const popular = useMemo(() => popularCalls(calls), [calls])
+  const promoted = useMemo(() => new Set(popular.map((event) => event.id)), [popular])
+  const more = calls.filter((event) => event.id !== current?.id && !promoted.has(event.id))
   const visibleMore = openLot ? more : more.slice(0, MORE_STACK)
 
   return {
@@ -124,6 +131,7 @@ function useCallBoard(events: readonly BoardEvent[]) {
     calls,
     index,
     setIndex,
+    popular,
     more,
     visibleMore,
     openLot,
@@ -369,6 +377,16 @@ export default function Page() {
   const crowd = useLotCrowd(events, loading)
   const board = useCallBoard(events)
   const extraCalls = board.more.length - board.visibleMore.length
+  // The popular section only exists once calls have picks on them, so the numbers on the plywood
+  // have to close up behind it rather than skipping 02.
+  const hasPopular = board.popular.length > 0
+  const step = {
+    sign: '01',
+    popular: '02',
+    rest: hasPopular ? '03' : '02',
+    loud: hasPopular ? '04' : '03',
+    mine: hasPopular ? '05' : '04',
+  }
 
   return (
     <div data-density="sparse" data-archetype="tailgate">
@@ -409,7 +427,7 @@ export default function Page() {
 
           <section className="tailgate-section venue-lead">
             <div className="tailgate-section__head">
-              <span>01</span>
+              <span>{step.sign}</span>
               <h2>Today’s big sign</h2>
               <p>One call on the cooler. Next when you’re ready.</p>
             </div>
@@ -427,11 +445,22 @@ export default function Page() {
             />
           </section>
 
+          {hasPopular ? (
+            <section className="tailgate-section">
+              <div className="tailgate-section__head">
+                <span>{step.popular}</span>
+                <h2>The busiest signs</h2>
+                <p>Where everyone else is standing. Straight to the calls with the most picks on them.</p>
+              </div>
+              <LotPopular calls={board.popular} />
+            </section>
+          ) : null}
+
           <section className="tailgate-section">
             <div className="tailgate-section__head">
-              <span>02</span>
-              <h2>More around the lot</h2>
-              <p>A short stack. Flip through the rest when you want them.</p>
+              <span>{step.rest}</span>
+              <h2>The rest of the lot</h2>
+              <p>Every other call that’s chalked up. Open the whole lot when you want it.</p>
             </div>
             <MarketGrid
               events={board.visibleMore}
@@ -459,7 +488,7 @@ export default function Page() {
 
           <section className="tailgate-competition">
             <div className="tailgate-section__head">
-              <span>03</span>
+              <span>{step.loud}</span>
               <h2>Loudest in the lot</h2>
               <p>Being right earns the folding-chair bragging rights.</p>
             </div>
@@ -477,7 +506,7 @@ export default function Page() {
 
           <section className="tailgate-section tailgate-positions">
             <div className="tailgate-section__head">
-              <span>04</span>
+              <span>{step.mine}</span>
               <h2>Your calls</h2>
               <p>Everything you put on the record, in one place.</p>
             </div>

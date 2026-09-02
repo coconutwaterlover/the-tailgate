@@ -8,6 +8,8 @@ import { TailgateHeader } from '../../components/tailgate-header'
 import { TailgateOtherLots } from '../../components/tailgate-other-lots'
 import { WalletButton } from '../../components/tailgate-session'
 import { TailgateComments } from '../../components/tailgate-comments'
+import { LotSettles } from '../../components/lot-settles'
+import { LotGraph } from '../../components/lot-graph'
 
 function TailgateEmpty({ title, message }: { title: string; message: string }) {
   return (
@@ -58,7 +60,27 @@ export function MarketView({ id }: { id: string }) {
         ) : (
           <>
             <div className="tailgate-detail-kicker">Make your call</div>
-            <MarketDetail marketId={id} event={asked} />
+            {/* HOW IT SETTLES, AT THE TOP. This was a collapsed disclosure under the activity feed,
+                which is the same as absent: "unless he scrolls down till the bottom there is no info
+                about that" (demo feedback, Sep 1). It reads the market's own resolution text. */}
+            <LotSettles market={asked} />
+            {/* `chart` is the kit's documented slot. The default <PriceChart> strokes mint green on
+                this venue's green field and always draws a 0–100 axis; LotGraph frames the kit's own
+                chart on a chalked panel and zooms it to the band the call actually trades in. */}
+            <MarketDetail
+              marketId={id}
+              event={asked}
+              chart={<LotGraph marketId={id} outcomes={asked.outcomes} />}
+            />
+            {/* WHY a market resolved the way it did, with its sources. Works with no configuration at
+                all, and it is the honest answer to "why did I lose?" — which is the question that
+                decides whether someone comes back. Directly under the market now, with the settling
+                rules above it, so the whole "how does this end" story is above the social surfaces. */}
+            <h2 className="venue-section">The final word</h2>
+            <ResolutionReceipt
+              marketId={id}
+              emptyState={<TailgateEmpty title="The whistle has not blown" message="The final receipt lands after this call settles." />}
+            />
             <WhoCalledIt
               marketId={id}
               outcomes={asked.outcomes}
@@ -69,14 +91,6 @@ export function MarketView({ id }: { id: string }) {
               marketId={id}
               emptyState={<TailgateEmpty title="The folding chairs are quiet" message="Bring the first take to the circle." />}
             />
-            {/* WHY a market resolved the way it did, with its sources. Works with no configuration at
-                all, and it is the honest answer to "why did I lose?" — which is the question that
-                decides whether someone comes back. */}
-            <h2 className="venue-section">The final word</h2>
-            <ResolutionReceipt
-              marketId={id}
-              emptyState={<TailgateEmpty title="The whistle has not blown" message="The final receipt lands after this call settles." />}
-            />
             {/* The trades on THIS market. Scoped by marketId, so unlike the venue-wide feed on the
                 home page it needs no venue id and is true from the first run. */}
             <h2 className="venue-section">Recent calls</h2>
@@ -85,7 +99,6 @@ export function MarketView({ id }: { id: string }) {
               limit={10}
               emptyState={<TailgateEmpty title="The cooler lid is clean" message="The next call leaves the first mark." />}
             />
-            <ResolutionNotes market={asked} />
           </>
         )}
         <TailgateOtherLots />
@@ -171,56 +184,4 @@ function WhoCalledIt({
       )}
     </section>
   )
-}
-
-/**
- * How this market resolves — collapsed, because almost nobody wants it and the few who do want ALL
- * of it. The rating is not decoration: the criteria say how many sources have to agree, whether
- * they were reachable, and whether the window is sound. That is the honest answer to "how do you
- * decide", and it is already on the market.
- */
-// `title` AND `caliber` ARE NULLABLE, and this said `string` / `Caliber`. The caller passes a whole
-// wire `Event`, where both are `| null` — so a fresh scaffold did not typecheck (SOC-560 #4b).
-// Nothing failed at runtime, because the branches below test for absence anyway; the check that would
-// have said so was never runnable. `| null` rather than making the caller coalesce: this component
-// reads what the API returns, and the API returns null.
-function ResolutionNotes({ market }: { market: { title?: string | null; caliber?: Caliber | null } }) {
-  const c = market.caliber
-  if (!c || c.status !== 'rated') return null
-  return (
-    <details className="venue-resolution">
-      <summary>
-        How this resolves
-        {c.band ? <span className="venue-resolution__band">Rated {c.band}</span> : null}
-      </summary>
-      {c.definition ? <p className="venue-resolution__lead">{c.definition}</p> : null}
-      <ul className="venue-resolution__criteria">
-        {(c.criteria ?? []).map((k) => (
-          <li key={k.key} data-status={k.status}>
-            <strong>{k.name}</strong> {k.summary}
-          </li>
-        ))}
-      </ul>
-      {c.detailUrl ? (
-        <a href={c.detailUrl} target="_blank" rel="noreferrer noopener">
-          Full rating on Caliber ↗
-        </a>
-      ) : null}
-    </details>
-  )
-}
-
-// Shape of the rating carried on every market. Declared locally rather than imported: it is read
-// here and nowhere else, and a wrong guess would fail at the type level rather than at runtime.
-// A STRUCTURAL SHIM for the fields this component reads, deliberately — importing the wire type
-// would tie the emitted page to a schema version it does not pin. It has to be assignable FROM the
-// real one though, and it was not: every field on the wire's caliber is nullable and this declared
-// them merely optional, so passing an actual API row was a type error (SOC-560 #4b). `| null`
-// everywhere; the reads below already test each one.
-interface Caliber {
-  status?: string | null
-  band?: string | null
-  definition?: string | null
-  detailUrl?: string | null
-  criteria?: Array<{ key: string; name: string; status: string; summary?: string | null }> | null
 }
