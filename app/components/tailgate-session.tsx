@@ -75,7 +75,11 @@ function WalletChair() {
     session?.wallet ??
     null
 
-  const walletChainId = client?.chain?.id ?? null
+  // `client.chain` is typed `never` on this Privy version, so the chain id the client really carries
+  // is unreachable through the declared type — and `vinext build` does not typecheck, so this only
+  // ever failed on Vercel, where `next build` does. Read it through the shape it actually has
+  // rather than widening the whole client.
+  const walletChainId = (client as { chain?: { id?: number } } | null | undefined)?.chain?.id ?? null
   const chain = walletChainId != null ? CHAINS[walletChainId] : null
   const venueChain = CHAINS[VENUE_CHAIN_ID]
   const onVenueChain = walletChainId === VENUE_CHAIN_ID

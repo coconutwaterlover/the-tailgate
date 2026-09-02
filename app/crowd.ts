@@ -172,7 +172,11 @@ function lineForMarket(event: CrowdEvent): string | null {
   ])
 }
 
-function leadingSide(event: CrowdEvent): { name: string; share: number; rest: number } | null {
+/**
+ * Which side the lot is leaning, as a short name and its share. Exported because the popular-calls
+ * blocks on the home page say the same thing the chatter does, and two copies of this drift.
+ */
+export function leadingSide(event: CrowdEvent): { name: string; share: number; rest: number } | null {
   const outcomes = event.outcomes ?? []
   if (outcomes.length < 2) return null
 

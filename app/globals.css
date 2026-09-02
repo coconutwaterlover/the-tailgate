@@ -1959,3 +1959,414 @@ body {
 .venue-resolution > a:hover {
   text-decoration: underline;
 }
+
+/* ── HOW THIS CALL SETTLES ──────────────────────────────────────────────────────────────────────
+   Demo feedback (Sep 1): the resolution rules were a closed disclosure at the very bottom of the
+   market page. This is the same content, first, on the back-of-the-sign panel. */
+.lot-settles {
+  display: grid;
+  gap: calc(var(--pc-space) * 4);
+  padding: calc(var(--pc-space) * 6);
+  border: 2px solid var(--pc-border);
+  border-radius: var(--pc-radius);
+  background:
+    repeating-linear-gradient(
+      -78deg,
+      color-mix(in srgb, var(--pc-border) 5%, transparent) 0 2px,
+      transparent 2px 16px
+    ),
+    var(--pc-surface);
+  box-shadow: 5px 6px 0 color-mix(in srgb, var(--pc-border) 20%, transparent);
+}
+
+.lot-settles__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: calc(var(--pc-space) * 3);
+}
+
+.lot-settles__head > span {
+  color: var(--pc-muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  flex: 1 0 100%;
+}
+
+/* Deliberately smaller than the market's own h1 below it. This panel is first on the page because
+   nobody was scrolling to the bottom to find it — not because it outranks the question. */
+.lot-settles__head h2 {
+  margin: 0;
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-size: 1.1rem;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--pc-text);
+}
+
+.lot-settles__head em {
+  padding: 2px 9px;
+  border: 1px solid var(--pc-border);
+  border-radius: 999px;
+  color: var(--pc-muted);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lot-settles__lead {
+  margin: 0;
+  max-width: 68ch;
+  color: var(--pc-text);
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+
+.lot-settles__rules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: calc(var(--pc-space) * 4);
+  margin: 0;
+}
+
+.lot-settles__rules > div {
+  display: grid;
+  gap: 4px;
+  padding-left: calc(var(--pc-space) * 4);
+  border-left: 4px solid var(--pc-muted);
+}
+
+.lot-settles__rules > div[data-tone='right'] {
+  border-left-color: var(--pc-gain);
+}
+
+.lot-settles__rules > div[data-tone='wrong'] {
+  border-left-color: var(--pc-danger);
+}
+
+.lot-settles__rules dt {
+  color: var(--pc-muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lot-settles__rules dd {
+  margin: 0;
+  color: var(--pc-text);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.lot-settles__clock {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--pc-space) * 3) calc(var(--pc-space) * 8);
+  padding-top: calc(var(--pc-space) * 3);
+  border-top: 2px dashed color-mix(in srgb, var(--pc-border) 55%, transparent);
+  color: var(--pc-text);
+  font-size: 0.86rem;
+}
+
+.lot-settles__clock strong {
+  color: var(--pc-muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lot-settles .venue-resolution {
+  margin-top: 0;
+  background: color-mix(in srgb, var(--pc-inner) 40%, var(--pc-surface));
+}
+
+/* ── THE GRAPH ──────────────────────────────────────────────────────────────────────────────────
+   The kit's <PriceChart> draws the line; this is the panel it stands on and the band it is read
+   against. Before this the line was green on the venue's own green field. */
+.lot-graph {
+  display: grid;
+  gap: calc(var(--pc-space) * 3);
+  margin: 0;
+}
+
+.lot-graph__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--pc-space) * 3);
+}
+
+.lot-graph__title {
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--pc-text);
+}
+
+.lot-graph__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--pc-space) * 3);
+}
+
+.lot-graph__meta strong {
+  color: var(--pc-text);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.lot-graph__scale {
+  padding: 2px 8px;
+  border: 1px dashed var(--pc-border);
+  color: var(--pc-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+/* THE BACKGROUND. `--pc-surface` under the line, a chalk rule at the edges, and the venue's field
+   stops showing through — which is the whole of "put a background on that". */
+.lot-graph__frame {
+  position: relative;
+  padding: 14px 14px 14px 46px;
+  border: 2px solid var(--pc-border);
+  border-radius: var(--pc-radius);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--pc-onaccent) 55%, transparent), transparent 42%),
+    var(--pc-surface);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pc-border) 18%, transparent);
+}
+
+.lot-graph__frame--plain {
+  padding-left: 14px;
+}
+
+.lot-graph__window {
+  position: relative;
+  height: var(--graph-h, 224px);
+  overflow: hidden;
+}
+
+/* The zoom: a taller plot, offset, seen through a shorter window. Every coordinate inside it is the
+   kit's own, so the line and its value pill stay in step. */
+.lot-graph__pane {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--graph-top, 0);
+  height: var(--graph-pane-h, var(--graph-h, 224px));
+}
+
+.lot-graph__ticks {
+  position: absolute;
+  top: 14px;
+  left: 46px;
+  right: 14px;
+  height: var(--graph-h, 224px);
+  pointer-events: none;
+}
+
+.lot-graph__ticks span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 1px dashed color-mix(in srgb, var(--pc-border) 32%, transparent);
+}
+
+.lot-graph__ticks em {
+  position: absolute;
+  right: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--pc-muted);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* The kit injects its own chart CSS with `color: inherit`; give it the venue's ink so the
+   "no price history yet" line and the value pill are readable on the panel. */
+.lot-graph .pchart {
+  color: var(--pc-text);
+}
+
+/* ── WHERE THE LOT'S PILING IN ──────────────────────────────────────────────────────────────────
+   Demo feedback (Sep 1): "above it if you have popular calls. So where everyone else is going." */
+.tailgate-popular {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: calc(var(--pc-space) * 5);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tailgate-popular__card {
+  display: grid;
+  gap: calc(var(--pc-space) * 3);
+  align-content: start;
+  height: 100%;
+  padding: calc(var(--pc-space) * 5);
+  border: 2px solid var(--pc-border);
+  border-radius: var(--pc-radius);
+  background:
+    linear-gradient(100deg, rgba(255, 255, 255, 0.16), transparent 58%),
+    var(--pc-inner);
+  color: var(--pc-text);
+  text-decoration: none;
+  box-shadow: 4px 5px 0 color-mix(in srgb, var(--pc-border) 24%, transparent);
+}
+
+.tailgate-popular li:nth-child(2) .tailgate-popular__card {
+  transform: rotate(-0.5deg);
+}
+
+.tailgate-popular li:nth-child(3) .tailgate-popular__card {
+  transform: rotate(0.4deg);
+}
+
+.tailgate-popular__card:hover {
+  border-color: var(--pc-accent);
+  box-shadow: 4px 5px 0 color-mix(in srgb, var(--pc-accent) 34%, transparent);
+}
+
+.tailgate-popular__tape {
+  justify-self: start;
+  padding: 3px 9px;
+  background: var(--pc-accent);
+  color: var(--pc-onaccent);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.tailgate-popular__game {
+  color: var(--pc-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tailgate-popular__title {
+  font-family: "Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive;
+  font-size: 1.2rem;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--pc-text);
+}
+
+.tailgate-popular__lean {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px calc(var(--pc-space) * 3);
+}
+
+.tailgate-popular__side {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.tailgate-popular__share {
+  font-size: 1.05rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.tailgate-popular__bar {
+  grid-column: 1 / -1;
+  height: 9px;
+  border: 1px solid var(--pc-border);
+  background: color-mix(in srgb, var(--pc-surface) 70%, transparent);
+  overflow: hidden;
+}
+
+.tailgate-popular__bar i {
+  display: block;
+  height: 100%;
+  background: var(--pc-gain);
+}
+
+.tailgate-popular__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--pc-space) * 2);
+  padding-top: calc(var(--pc-space) * 3);
+  border-top: 2px dashed color-mix(in srgb, var(--pc-border) 50%, transparent);
+  color: var(--pc-muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.tailgate-popular__go {
+  color: var(--pc-accent);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 760px) {
+  .lot-settles {
+    padding: calc(var(--pc-space) * 4);
+  }
+
+  .lot-settles__rules {
+    grid-template-columns: 1fr;
+  }
+
+  .lot-graph__frame {
+    padding-left: 40px;
+  }
+
+  .lot-graph__ticks {
+    left: 40px;
+  }
+
+  .tailgate-popular {
+    grid-template-columns: 1fr;
+  }
+
+  .tailgate-popular li .tailgate-popular__card {
+    transform: none;
+  }
+}
+
+.lot-settles__flag {
+  display: flex;
+  gap: calc(var(--pc-space) * 3);
+  margin: 0;
+  padding: calc(var(--pc-space) * 3) calc(var(--pc-space) * 4);
+  border-left: 4px solid var(--pc-danger);
+  background: color-mix(in srgb, var(--pc-danger) 8%, transparent);
+  color: var(--pc-text);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.lot-settles__flag::before {
+  content: '!';
+  color: var(--pc-danger);
+  font-weight: 900;
+}
